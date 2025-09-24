@@ -26,5 +26,6 @@ public class Main {
     List<PointDTO> noLoopsRouted2 = service.connectSnappedPointsWithRoutes(noLoops2);
 
     service.outputGPX(noLoopsRouted2);
+    service.outputGpxWaypoints(noLoopsRouted2);
   }
 }

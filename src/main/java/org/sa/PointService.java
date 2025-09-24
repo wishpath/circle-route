@@ -168,5 +168,32 @@ public class PointService {
 
     return null;
   }
+
+  public void outputGpxWaypoints(List<PointDTO> points) { //for the display of points on the map rather than continuous route
+    try {
+      File dir = new File(GPX_OUTPUT_DIR);
+      if (!dir.exists()) dir.mkdirs();
+
+      File gpxFile = new File(dir, CIRCLE_AND_MAP_DATA_NAME + "-circle-waypoints.gpx");
+      try (FileWriter writer = new FileWriter(gpxFile)) {
+        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        writer.write("<gpx version=\"1.1\" creator=\"PointService\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");
+
+        for (int i = 0; i < points.size(); i++) {
+          PointDTO p = points.get(i);
+          writer.write(String.format("  <wpt lat=\"%f\" lon=\"%f\">\n", p.latitude, p.longitude));
+          writer.write("    <name>Point " + (i + 1) + "</name>\n");
+          writer.write("  </wpt>\n");
+        }
+
+        writer.write("</gpx>\n");
+      }
+
+      System.out.println("Waypoints GPX file written to: " + gpxFile.getAbsolutePath());
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to write GPX waypoints file", e);
+    }
+  }
+
 }
 
