@@ -1,19 +1,42 @@
 package org.sa;
 
+import java.util.List;
+
 public class GeoUtils {
 
-  /** Returns distance in km between two points using Haversine formula */
-  public static double haversine(PointDTO p1, PointDTO p2) {
+  /**
+   * Calculates the great-circle distance (in kilometers) between two geographic points
+   * on the Earth's surface using the Haversine formula.
+   *
+   * The Earth is modeled as a perfect sphere with radius 6371 km, so this gives
+   * the distance along the curve of the Earth ("as the crow flies"), not a flat
+   * straight-line projection.
+   */
+  public static double getDistanceBetweenLocations(PointDTO from, PointDTO to) {
     double earthRadiusKm = 6371.0;
-    double dLat = Math.toRadians(p2.latitude - p1.latitude);
-    double dLon = Math.toRadians(p2.longitude - p1.longitude);
-    double lat1 = Math.toRadians(p1.latitude);
-    double lat2 = Math.toRadians(p2.latitude);
 
-    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-        + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return earthRadiusKm * c;
+    /** A radian is the way we measure angular distance on Earth’s sphere when converting latitude and longitude differences */
+    double deltaLatitudeRadians = Math.toRadians(to.latitude - from.latitude);
+    double deltaLongitudeRadians = Math.toRadians(to.longitude - from.longitude);
+    double fromLatitudeRadians = Math.toRadians(from.latitude);
+    double toLatitudeRadians = Math.toRadians(to.latitude);
+
+    double haversine = Math.sin(deltaLatitudeRadians / 2) * Math.sin(deltaLatitudeRadians / 2)
+        + Math.sin(deltaLongitudeRadians / 2) * Math.sin(deltaLongitudeRadians / 2)
+        * Math.cos(fromLatitudeRadians) * Math.cos(toLatitudeRadians);
+
+    double angularDistance = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+    return earthRadiusKm * angularDistance;
+  }
+
+  public static double getRouteDistanceKm(List<PointDTO> route) {
+    return getRouteDistanceKm(route, 0, route.size() - 1);
+  }
+
+  public static double getRouteDistanceKm(List<PointDTO> route, int fromIndex, int toIndex) {
+    double totalDistance = 0.0;
+    for (int i = fromIndex; i < toIndex; i++)
+      totalDistance += getDistanceBetweenLocations(route.get(i), route.get(i + 1));
+    return totalDistance;
   }
 }
-

@@ -14,15 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PointService {
-  public static String MAP_DATA_PATH = "src/main/java/org/sa/map-data/planet_22.965,54.513_25.01,55.257.osm";
+  public static String KAUNAS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/planet_22.965,54.513_25.01,55.257.osm";
+  public static String ROKISKIS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/rokiskis_25.314_55.724_2c97fadb.osm";
   public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/output-gpx";
 
   private static GraphHopper hopper;
 
   static {
     hopper = new GraphHopper()
-        .setOSMFile(MAP_DATA_PATH)
-        .setGraphHopperLocation("graph-cache")
+        .setOSMFile(ROKISKIS_MAP_DATA_PATH)
+        .setGraphHopperLocation("rokiskis-graph-cache") //for new map data, please change this name, to build new chache
         .setProfiles(new Profile("foot").setVehicle("foot").setWeighting("fastest"))
         .importOrLoad();
   }
@@ -120,21 +121,31 @@ public class PointService {
   public List<PointDTO> removeLoops(List<PointDTO> routedPoints, double loopThresholdKm) {
     List<PointDTO> cleaned = new ArrayList<>();
     if (routedPoints.isEmpty()) return cleaned;
+    double routedPointsTotalDistance = GeoUtils.getRouteDistanceKm(routedPoints);
+    double loopSizeThreshold = routedPointsTotalDistance * 0.3;
 
     int i = 0; //routedPoints index
     //start always get added
-    cleaned.add(routedPoints.get(0));
+    //cleaned.add(routedPoints.get(0));
 
     //if loop is found — cut it out!
     for (; i < routedPoints.size(); i++) {
       Integer loopEndingIndex = getLoopEndingIndex(routedPoints, i, loopThresholdKm);
+
       if (loopEndingIndex == null) {
         cleaned.add(routedPoints.get(i));
         i++;
       }
       else {
-        cleaned.add(routedPoints.get(loopEndingIndex));
-        i = loopEndingIndex + 1;
+        boolean isLoopBig = GeoUtils.getRouteDistanceKm(routedPoints, i, loopEndingIndex) > loopSizeThreshold; // computationally expensive!!!
+        if (isLoopBig) { //if loop is big, still don't cut it
+          cleaned.add(routedPoints.get(i));
+          i++;
+        }
+        else { //cut out the loop
+          cleaned.add(routedPoints.get(loopEndingIndex));
+          i = loopEndingIndex + 1;
+        }
       }
     }
 
@@ -145,12 +156,15 @@ public class PointService {
     //get first index outside loopThreshold
     PointDTO current = routedPoints.get(i);
     Integer startIndex = i;
-    while (GeoUtils.haversine(routedPoints.get(startIndex), current) < loopThresholdKm)
+    while (GeoUtils.getDistanceBetweenLocations(routedPoints.get(startIndex), current) < loopThresholdKm) {
       startIndex++;
+      if (startIndex ==routedPoints.size())
+        return null;
+    }
 
     //start looking for the biggest possible loop, so start from the end point
     for (int j = routedPoints.size() - 2; j >= startIndex; j--)
-      if (GeoUtils.haversine(routedPoints.get(j), current) < loopThresholdKm)
+      if (GeoUtils.getDistanceBetweenLocations(routedPoints.get(j), current) < loopThresholdKm)
         return (Integer) j;
 
     return null;
