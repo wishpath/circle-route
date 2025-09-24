@@ -43,4 +43,5 @@ bin/
 #map data
 *planet_22.965,54.513_25.01,55.257.osm
 src/main/java/org/sa/map-data/*.osm
+**/*graph-cache*/
 

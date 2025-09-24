@@ -17,13 +17,15 @@ public class PointService {
   public static String KAUNAS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/planet_22.965,54.513_25.01,55.257.osm";
   public static String ROKISKIS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/rokiskis_25.314_55.724_2c97fadb.osm";
   public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/output-gpx";
+  public static String NAME_PART_FOR_GITIGNORE = "-graph-cache";
+  public static String CIRCLE_AND_MAP_DATA_NAME = "ROKISKIS";
 
   private static GraphHopper hopper;
 
   static {
     hopper = new GraphHopper()
         .setOSMFile(ROKISKIS_MAP_DATA_PATH)
-        .setGraphHopperLocation("rokiskis-graph-cache") //for new map data, please change this name, to build new chache
+        .setGraphHopperLocation(CIRCLE_AND_MAP_DATA_NAME + NAME_PART_FOR_GITIGNORE) //for new map data, please change this name, to build new chache
         .setProfiles(new Profile("foot").setVehicle("foot").setWeighting("fastest"))
         .importOrLoad();
   }
@@ -65,7 +67,7 @@ public class PointService {
       File dir = new File(GPX_OUTPUT_DIR);
       if (!dir.exists()) dir.mkdirs();
 
-      File gpxFile = new File(dir, "circle-route.gpx");
+      File gpxFile = new File(dir, CIRCLE_AND_MAP_DATA_NAME + "-circle-route.gpx");
       try (FileWriter writer = new FileWriter(gpxFile)) {
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         writer.write("<gpx version=\"1.1\" creator=\"PointService\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");
@@ -125,9 +127,6 @@ public class PointService {
     double loopSizeThreshold = routedPointsTotalDistance * 0.3;
 
     int i = 0; //routedPoints index
-    //start always get added
-    //cleaned.add(routedPoints.get(0));
-
     //if loop is found — cut it out!
     for (; i < routedPoints.size(); i++) {
       Integer loopEndingIndex = getLoopEndingIndex(routedPoints, i, loopThresholdKm);
