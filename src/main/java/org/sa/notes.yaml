@@ -1,2 +1,13 @@
 problems:
-  - if first and last points are in the loop
+  - if first and last points are in the loop:
+    - cut root in half "A and B" and join it as "B and A"
+  - fix doubled points (when snapping to road)
+
+get maps:
+  - small portions of map, smaller than Lithuania:
+    - https://garmin.bbbike.org/
+  - large files like "europe" 30gb:
+    -https://download.geofabrik.de/
+
+map format:
+  - .osm
