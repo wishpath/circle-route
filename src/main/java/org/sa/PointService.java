@@ -62,7 +62,7 @@ public class PointService {
     return snapped;
   }
 
-  public void outputGPX(List<PointDTO> circlePointsSnappedOnRoad) {
+  public void outputGPX(List<PointDTO> circlePointsSnappedOnRoad) { //overwrites
     try {
       File dir = new File(GPX_OUTPUT_DIR);
       if (!dir.exists()) dir.mkdirs();
@@ -126,11 +126,13 @@ public class PointService {
     double routedPointsTotalDistance = GeoUtils.getRouteDistanceKm(routedPoints);
     double loopSizeThreshold = routedPointsTotalDistance * 0.3;
 
-    int i = 0; //routedPoints index
+    int i = 0;
+
     //if loop is found — cut it out!
     for (; i < routedPoints.size(); i++) {
       Integer loopEndingIndex = getLoopEndingIndex(routedPoints, i, loopThresholdKm);
 
+      //no loop found
       if (loopEndingIndex == null) {
         cleaned.add(routedPoints.get(i));
         i++;
@@ -170,6 +172,7 @@ public class PointService {
   }
 
   public void outputGpxWaypoints(List<PointDTO> points) { //for the display of points on the map rather than continuous route
+    //overwrites
     try {
       File dir = new File(GPX_OUTPUT_DIR);
       if (!dir.exists()) dir.mkdirs();
@@ -195,5 +198,26 @@ public class PointService {
     }
   }
 
+  public List<PointDTO> shiftABtoBA(List<PointDTO> points) {
+    if (points == null || points.isEmpty()) return List.of();
+    int mid = points.size() / 2;
+    List<PointDTO> firstHalf = points.subList(0, mid);
+    List<PointDTO> secondHalf = points.subList(mid, points.size());
+    List<PointDTO> result = new ArrayList<>(secondHalf);
+    result.addAll(firstHalf);
+    return result;
+  }
+
+  public PointDTO movePoint(PointDTO point, double northKm, double eastKm) {
+    double earthKmPerDegree = 111.32;
+
+    double latOffset = northKm / earthKmPerDegree;
+    double lonOffset = eastKm / (earthKmPerDegree * Math.cos(Math.toRadians(point.latitude)));
+
+    double newLat = point.latitude + latOffset;
+    double newLon = point.longitude + lonOffset; // east is positive
+
+    return new PointDTO(newLat, newLon);
+  }
 }
 

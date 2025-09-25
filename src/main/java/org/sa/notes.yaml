@@ -7,7 +7,7 @@ get maps:
   - small portions of map, smaller than Lithuania:
     - https://garmin.bbbike.org/
   - large files like "europe" 30gb:
-    -https://download.geofabrik.de/
+    - https://download.geofabrik.de/
 
 map format:
   - .osm
