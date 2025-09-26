@@ -39,4 +39,38 @@ public class GeoUtils {
       totalDistance += getDistanceBetweenLocations(route.get(i), route.get(i + 1));
     return totalDistance;
   }
+
+  /**
+   * Approximates the area (in square kilometers) of the polygon formed by the given route.
+   * The route should form a closed loop (first point ≈ last point).
+   *
+   * Converts latitude/longitude degrees into approximate kilometers (with longitude
+   * scaled by cos(latitude)) and applies the Shoelace formula for polygon area.
+   */
+  public static double getRouteAreaKm(List<PointDTO> noLoopRoutedPoints) {
+    if (noLoopRoutedPoints.size() < 3) return 0.0;
+
+    double earthKmPerDegree = 111.32;
+    double accumulatedSum = 0.0;
+
+    for (int i = 0; i < noLoopRoutedPoints.size(); i++) {
+      PointDTO currentPoint = noLoopRoutedPoints.get(i);
+      PointDTO nextPoint = noLoopRoutedPoints.get((i + 1) % noLoopRoutedPoints.size());
+
+      double currentPointXkm = currentPoint.longitude * earthKmPerDegree * Math.cos(Math.toRadians(currentPoint.latitude));
+      double currentPointYkm = currentPoint.latitude * earthKmPerDegree;
+      double nextPointXkm = nextPoint.longitude * earthKmPerDegree * Math.cos(Math.toRadians(nextPoint.latitude));
+      double nextPointYkm = nextPoint.latitude * earthKmPerDegree;
+
+      accumulatedSum += (currentPointXkm * nextPointYkm - nextPointXkm * currentPointYkm);
+    }
+
+    double polygonAreaKm2 = Math.abs(accumulatedSum) / 2.0;
+    return polygonAreaKm2;
+  }
+
+  public static double getCircleAreaByLength(double circleLength) {
+    return (circleLength * circleLength) / (4 * Math.PI);
+  }
 }
+

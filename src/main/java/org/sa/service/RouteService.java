@@ -1,4 +1,4 @@
-package org.sa;
+package org.sa.service;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
@@ -6,26 +6,25 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.Profile;
 import com.graphhopper.util.shapes.GHPoint;
+import org.sa.GeoUtils;
+import org.sa.PointDTO;
+import org.sa.config.Props;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PointService {
+public class RouteService {
   public static String KAUNAS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/planet_22.965,54.513_25.01,55.257.osm";
   public static String ROKISKIS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/rokiskis_25.314_55.724_2c97fadb.osm";
-  public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/output-gpx";
   public static String NAME_PART_FOR_GITIGNORE = "-graph-cache";
-  public static String CIRCLE_AND_MAP_DATA_NAME = "ROKISKIS";
+
 
   private static GraphHopper hopper;
 
   static {
     hopper = new GraphHopper()
         .setOSMFile(ROKISKIS_MAP_DATA_PATH)
-        .setGraphHopperLocation(CIRCLE_AND_MAP_DATA_NAME + NAME_PART_FOR_GITIGNORE) //for new map data, please change this name, to build new chache
+        .setGraphHopperLocation(Props.CIRCLE_AND_MAP_DATA_NAME + NAME_PART_FOR_GITIGNORE) //for new map data, please change this name, to build new chache
         .setProfiles(new Profile("foot").setVehicle("foot").setWeighting("fastest"))
         .importOrLoad();
   }
@@ -62,34 +61,6 @@ public class PointService {
     return snapped;
   }
 
-  public void outputGPX(List<PointDTO> circlePointsSnappedOnRoad) { //overwrites
-    try {
-      File dir = new File(GPX_OUTPUT_DIR);
-      if (!dir.exists()) dir.mkdirs();
-
-      File gpxFile = new File(dir, CIRCLE_AND_MAP_DATA_NAME + "-circle-route.gpx");
-      try (FileWriter writer = new FileWriter(gpxFile)) {
-        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        writer.write("<gpx version=\"1.1\" creator=\"PointService\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");
-        writer.write("  <trk>\n");
-        writer.write("    <name>Circle Route</name>\n");
-        writer.write("    <trkseg>\n");
-
-        for (PointDTO p : circlePointsSnappedOnRoad) {
-          writer.write(String.format("      <trkpt lat=\"%f\" lon=\"%f\"></trkpt>\n", p.latitude, p.longitude));
-        }
-
-        writer.write("    </trkseg>\n");
-        writer.write("  </trk>\n");
-        writer.write("</gpx>\n");
-      }
-
-      System.out.println("GPX file written to: " + gpxFile.getAbsolutePath());
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to write GPX file", e);
-    }
-  }
-
   public List<PointDTO> connectSnappedPointsWithRoutes(List<PointDTO> snappedPoints) {
     List<PointDTO> routedPoints = new ArrayList<>();
     for (int i = 0; i < snappedPoints.size() - 1; i++) {
@@ -120,7 +91,7 @@ public class PointService {
     return routedPoints;
   }
 
-  public List<PointDTO> removeLoops(List<PointDTO> routedPoints, double loopThresholdKm) {
+  public List<PointDTO> removeLoops(List<PointDTO> routedPoints, double indicatorOfLoop_maxDistance_loopStart_loopFinish) {
     List<PointDTO> cleaned = new ArrayList<>();
     if (routedPoints.isEmpty()) return cleaned;
     double routedPointsTotalDistance = GeoUtils.getRouteDistanceKm(routedPoints);
@@ -130,7 +101,7 @@ public class PointService {
 
     //if loop is found — cut it out!
     for (; i < routedPoints.size(); i++) {
-      Integer loopEndingIndex = getLoopEndingIndex(routedPoints, i, loopThresholdKm);
+      Integer loopEndingIndex = getLoopEndingIndex(routedPoints, i, indicatorOfLoop_maxDistance_loopStart_loopFinish);
 
       //no loop found
       if (loopEndingIndex == null) {
@@ -153,11 +124,11 @@ public class PointService {
     return cleaned;
   }
 
-  private Integer getLoopEndingIndex(List<PointDTO> routedPoints, int i, double loopThresholdKm) {
+  private Integer getLoopEndingIndex(List<PointDTO> routedPoints, int i, double indicatorOfLoop_maxDistance_loopStart_loopFinish) {
     //get first index outside loopThreshold
     PointDTO current = routedPoints.get(i);
     Integer startIndex = i;
-    while (GeoUtils.getDistanceBetweenLocations(routedPoints.get(startIndex), current) < loopThresholdKm) {
+    while (GeoUtils.getDistanceBetweenLocations(routedPoints.get(startIndex), current) < indicatorOfLoop_maxDistance_loopStart_loopFinish) {
       startIndex++;
       if (startIndex ==routedPoints.size())
         return null;
@@ -165,37 +136,10 @@ public class PointService {
 
     //start looking for the biggest possible loop, so start from the end point
     for (int j = routedPoints.size() - 2; j >= startIndex; j--)
-      if (GeoUtils.getDistanceBetweenLocations(routedPoints.get(j), current) < loopThresholdKm)
+      if (GeoUtils.getDistanceBetweenLocations(routedPoints.get(j), current) < indicatorOfLoop_maxDistance_loopStart_loopFinish)
         return (Integer) j;
 
     return null;
-  }
-
-  public void outputGpxWaypoints(List<PointDTO> points) { //for the display of points on the map rather than continuous route
-    //overwrites
-    try {
-      File dir = new File(GPX_OUTPUT_DIR);
-      if (!dir.exists()) dir.mkdirs();
-
-      File gpxFile = new File(dir, CIRCLE_AND_MAP_DATA_NAME + "-circle-waypoints.gpx");
-      try (FileWriter writer = new FileWriter(gpxFile)) {
-        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        writer.write("<gpx version=\"1.1\" creator=\"PointService\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");
-
-        for (int i = 0; i < points.size(); i++) {
-          PointDTO p = points.get(i);
-          writer.write(String.format("  <wpt lat=\"%f\" lon=\"%f\">\n", p.latitude, p.longitude));
-          writer.write("    <name>Point " + (i + 1) + "</name>\n");
-          writer.write("  </wpt>\n");
-        }
-
-        writer.write("</gpx>\n");
-      }
-
-      System.out.println("Waypoints GPX file written to: " + gpxFile.getAbsolutePath());
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to write GPX waypoints file", e);
-    }
   }
 
   public List<PointDTO> shiftABtoBA(List<PointDTO> points) {

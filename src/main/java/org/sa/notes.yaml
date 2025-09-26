@@ -1,6 +1,6 @@
 problems:
-  - if first and last points are in the loop:
-    - cut root in half "A and B" and join it as "B and A"
+  - can force turn on highway to required directions
+  - calculate area
   - fix doubled points (when snapping to road)
 
 get maps:
