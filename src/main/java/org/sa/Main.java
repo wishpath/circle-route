@@ -1,18 +1,18 @@
 package org.sa;
 
+import org.sa.config.Props;
 import org.sa.service.OutputService;
 import org.sa.service.RouteService;
 
 import java.util.List;
 
 public class Main {
-  public static final PointDTO KAUNAS_CENTER = new PointDTO(54.8985, 23.9036);
-  public static final PointDTO ROKISKIS_CENTER = new PointDTO(55.9474, 25.5948);
+
   public static void main(String[] args) {
     RouteService routeService = new RouteService();
     OutputService outputService = new OutputService();
     //loop center points that i want to try here, but for now just go with one point:
-    PointDTO routeCenterPoint = routeService.movePoint(ROKISKIS_CENTER, 2.0, -0.7);
+    PointDTO routeCenterPoint = routeService.movePoint(Props.CIRCLE_CENTER, 2.0, -0.7);
     List<PointDTO> perfectCirclePoints = routeService.generatePerfectCirclePoints(routeCenterPoint, 25, 2);
     System.out.println("perfect circle points: " + perfectCirclePoints.size());
     List<PointDTO> circlePointsSnappedOnRoad = routeService.snapPointsOnRoadGrid(perfectCirclePoints);

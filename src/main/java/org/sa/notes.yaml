@@ -1,13 +1,13 @@
 problems:
   - shift not 50% %50 ab, but each time by 25% (this can change course direction as well in the same step)
   - can force turn on highway to required directions
-  - calculate area
   - sliding efficiency window:
     - start small like 100m and increment up to 25percent of route. by 100m step
       - slide this window through all route
-        - retroute start and end of this window
+        - reroute start and end of this window (using multiple profiles like "running, cycling, car, motorcycle", maybe some of them only)
           - if rerouting would impact course efficiency positively - keep the new routing. get a new window after injected part.
           - else keep sliding
+  - change map data to remove limitations?
 
 get maps:
   - small portions of map, smaller than Lithuania:

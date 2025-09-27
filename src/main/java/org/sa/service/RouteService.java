@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RouteService {
-  public static String KAUNAS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/planet_22.965,54.513_25.01,55.257.osm";
-  public static String ROKISKIS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/rokiskis_25.314_55.724_2c97fadb.osm";
+
   public static String NAME_PART_FOR_GITIGNORE = "-graph-cache";
 
 
@@ -23,7 +22,7 @@ public class RouteService {
 
   static {
     hopper = new GraphHopper()
-        .setOSMFile(ROKISKIS_MAP_DATA_PATH)
+        .setOSMFile(Props.MAP_DATA_PATH)
         .setGraphHopperLocation(Props.CIRCLE_AND_MAP_DATA_NAME + NAME_PART_FOR_GITIGNORE) //for new map data, please change this name, to build new chache
         .setProfiles(new Profile("foot").setVehicle("foot").setWeighting("fastest"))
         .importOrLoad();
