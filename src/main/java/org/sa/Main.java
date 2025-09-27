@@ -1,6 +1,7 @@
 package org.sa;
 
 import org.sa.config.Props;
+import org.sa.service.GeoUtils;
 import org.sa.service.OutputService;
 import org.sa.service.RouteService;
 
@@ -26,9 +27,11 @@ public class Main {
     double routeLength = Math.round(GeoUtils.getRouteDistanceKm(noLoopRoutedPoints) * 100.0) / 100.0;
     double routeAreaKm = Math.round(GeoUtils.getRouteAreaKm(noLoopRoutedPoints) * 100.0) / 100.0;
     double idealAreaKm = Math.round(GeoUtils.getCircleAreaByLength(routeLength) * 100.0) / 100.0;
+    double perfectSquareAreaKm = Math.round((routeLength * routeLength / 16) * 100.0) / 100.0;
     double routeAreaPerKm = Math.round((routeAreaKm / routeLength) * 100.0) / 100.0;
     double ideaAreaPerKm = Math.round((idealAreaKm / routeLength) * 100.0) / 100.0;
     int efficiencyPercent = (int)(routeAreaKm/idealAreaKm*100);
+    int perfectSquareEfficiencyPercent = (int)(perfectSquareAreaKm/idealAreaKm*100);
     System.out.println(
       "\nEFFICIENCY: " +
       "\nLength: " + routeLength +
@@ -36,7 +39,8 @@ public class Main {
       " sq.km\nArea per 1km: " + routeAreaPerKm +
       " sq.km/1km\nFor this length ideally area would be: " + idealAreaKm +
       " sq.km\nFor this length ideally area per 1km would be: " + ideaAreaPerKm +
-      " sq.km/1km\nEfficiency for this length: " + efficiencyPercent + "%\n\n"
+      " sq.km/1km\nEfficiency for this length: " + efficiencyPercent +
+      "%\nEfficiency of perfect square for this length would be: " + perfectSquareEfficiencyPercent + "%\n\n"
       );
     outputService.outputGPX(noLoopRoutedPoints);
     outputService.outputGpxWaypoints(noLoopRoutedPoints);

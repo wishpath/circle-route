@@ -1,4 +1,6 @@
-package org.sa;
+package org.sa.service;
+
+import org.sa.PointDTO;
 
 import java.util.List;
 

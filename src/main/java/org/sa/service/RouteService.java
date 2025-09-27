@@ -6,7 +6,6 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.Profile;
 import com.graphhopper.util.shapes.GHPoint;
-import org.sa.GeoUtils;
 import org.sa.PointDTO;
 import org.sa.config.Props;
 
