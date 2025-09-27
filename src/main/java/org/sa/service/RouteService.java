@@ -16,13 +16,14 @@ import java.util.List;
 
 public class RouteService {
 
-  public static String NAME_PART_FOR_GITIGNORE = "-graph-cache";
+
+
   private static GraphHopper hopper;
 
   static {
     hopper = new GraphHopper()
         .setOSMFile(Props.MAP_DATA_PATH)
-        .setGraphHopperLocation(Props.CIRCLE_AND_MAP_DATA_NAME + NAME_PART_FOR_GITIGNORE) //for new map data, please change this name, to build new chache
+        .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
         .setProfiles(new Profile(Props.GRASSHOPPER_PROFILE).setVehicle("foot").setWeighting("shortest"))
         .importOrLoad();
   }
@@ -59,44 +60,6 @@ public class RouteService {
     return snapped;
   }
 
-//  public List<PointDTO> connectSnappedPointsWithRoutes(List<PointDTO> snappedPoints) {
-//    List<PointDTO> routedPoints = new ArrayList<>();
-//    for (int i = 0; i < snappedPoints.size() - 1; i++) {
-//      PointDTO from = snappedPoints.get(i);
-//      PointDTO to = snappedPoints.get(i + 1);
-//
-//      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile("foot");
-//      GHResponse rsp = hopper.route(req);
-//
-//      if (!rsp.hasErrors()) {
-//        ResponsePath path = rsp.getBest();
-//        path.getPoints().forEach(p -> routedPoints.add(new PointDTO(p.lat, p.lon)));
-////        path.getInstructions().forEach(instr -> {
-////          GHPoint junction = instr.getPoints().get(0); // first point of this instruction
-////          routedPoints.add(new PointDTO(junction.lat, junction.lon));
-////        });
-//      } else {
-//        // fallback: just add straight line
-//        routedPoints.add(from);
-//        routedPoints.add(to);
-//      }
-//    }
-//    // close the loop: last point back to first
-//    PointDTO first = snappedPoints.get(0);
-//    PointDTO last = snappedPoints.get(snappedPoints.size() - 1);
-//    GHRequest req = new GHRequest(last.latitude, last.longitude, first.latitude, first.longitude).setProfile("foot");
-//    GHResponse rsp = hopper.route(req);
-//    if (!rsp.hasErrors()) {
-//      ResponsePath path = rsp.getBest();
-//      path.getPoints().forEach(p -> routedPoints.add(new PointDTO(p.lat, p.lon)));
-////      path.getInstructions().forEach(instr -> {
-////        GHPoint junction = instr.getPoints().get(0); // first point of this instruction
-////        routedPoints.add(new PointDTO(junction.lat, junction.lon));
-////      });
-//    }
-//    return routedPoints;
-//  }
-
   public List<PointDTO> connectSnappedPointsWithRoutes(List<PointDTO> snappedPoints) {
     List<PointDTO> routedPoints = new ArrayList<>();
     for (int i = 0; i < snappedPoints.size() - 1; i++) {
@@ -128,8 +91,6 @@ public class RouteService {
     return routedPoints;
   }
 
-
-
   public List<PointDTO> removeLoops(List<PointDTO> routedPoints, double indicatorOfLoop_maxDistance_loopStart_loopFinish) {
     List<PointDTO> cleaned = new ArrayList<>();
     if (routedPoints.isEmpty()) return cleaned;
@@ -159,7 +120,6 @@ public class RouteService {
         }
       }
     }
-
     return cleaned;
   }
 

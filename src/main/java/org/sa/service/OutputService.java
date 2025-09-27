@@ -17,7 +17,7 @@ public class OutputService {
       File dir = new File(GPX_OUTPUT_DIR);
       if (!dir.exists()) dir.mkdirs();
 
-      File gpxFile = new File(dir, Props.CIRCLE_AND_MAP_DATA_NAME + "-circle-waypoints.gpx");
+      File gpxFile = new File(dir, Props.DATA_NAME + "-circle-waypoints.gpx");
       try (FileWriter writer = new FileWriter(gpxFile)) {
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         writer.write("<gpx version=\"1.1\" creator=\"PointService\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");
@@ -43,7 +43,7 @@ public class OutputService {
       File dir = new File(GPX_OUTPUT_DIR);
       if (!dir.exists()) dir.mkdirs();
 
-      File gpxFile = new File(dir, Props.CIRCLE_AND_MAP_DATA_NAME + "-circle-route.gpx");
+      File gpxFile = new File(dir, Props.DATA_NAME + "-circle-route.gpx");
       try (FileWriter writer = new FileWriter(gpxFile)) {
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         writer.write("<gpx version=\"1.1\" creator=\"PointService\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");
