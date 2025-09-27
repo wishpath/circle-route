@@ -48,7 +48,7 @@ public class Main {
     System.out.println("1 loops cut: " + noLoops.size());
     List<PointDTO> noLoopsRouted = service.connectSnappedPointsWithRoutes(noLoops); //reroute to fix loop cuts
     System.out.println("1 rerout: " + noLoopsRouted.size());
-    List<PointDTO> shifted = service.shiftABtoBA(noLoopsRouted);
+    List<PointDTO> shifted = service.shiftABtoBA_andReverse(noLoopsRouted);
     System.out.println("1 shifted: " + shifted.size());
 
     for (int i = 2; i < 8; i++, indicatorOfLoop_maxDistance_loopStart_loopFinish_km /= 1.5) {
@@ -57,7 +57,7 @@ public class Main {
       System.out.println(i + " loops cut: " + noLoops.size());
       noLoopsRouted = service.connectSnappedPointsWithRoutes(noLoops);
       System.out.println(i + " rerout: " + noLoopsRouted.size());
-      shifted = service.shiftABtoBA(noLoopsRouted);
+      shifted = service.shiftABtoBA_andReverse(noLoopsRouted);
       System.out.println(i + " shifted: " + shifted.size());
     }
     return shifted;

@@ -11,6 +11,7 @@ import org.sa.PointDTO;
 import org.sa.config.Props;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RouteService {
@@ -182,13 +183,14 @@ public class RouteService {
     return null;
   }
 
-  public List<PointDTO> shiftABtoBA(List<PointDTO> points) {
+  public List<PointDTO> shiftABtoBA_andReverse(List<PointDTO> points) {
     if (points == null || points.isEmpty()) return List.of();
-    int mid = points.size() / 2;
+    int mid = (int)((double) points.size() * 0.28);
     List<PointDTO> firstHalf = points.subList(0, mid);
     List<PointDTO> secondHalf = points.subList(mid, points.size());
     List<PointDTO> result = new ArrayList<>(secondHalf);
     result.addAll(firstHalf);
+    Collections.reverse(points);
     return result;
   }
 
