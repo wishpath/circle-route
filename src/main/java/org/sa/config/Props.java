@@ -12,4 +12,9 @@ public class Props {
   public static String ROKISKIS_MAP_DATA_PATH = "src/main/java/org/sa/map-data/rokiskis_25.314_55.724_2c97fadb.osm";
   public static String MAP_DATA_PATH = ROKISKIS_MAP_DATA_PATH;
 
+
+  public static String GRASSHOPPER_PROFILE = "free"; //can be "foot" | delete cache when changed
+
+
+
 }

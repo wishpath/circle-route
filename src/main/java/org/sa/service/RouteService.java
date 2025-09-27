@@ -17,15 +17,13 @@ import java.util.List;
 public class RouteService {
 
   public static String NAME_PART_FOR_GITIGNORE = "-graph-cache";
-
-
   private static GraphHopper hopper;
 
   static {
     hopper = new GraphHopper()
         .setOSMFile(Props.MAP_DATA_PATH)
         .setGraphHopperLocation(Props.CIRCLE_AND_MAP_DATA_NAME + NAME_PART_FOR_GITIGNORE) //for new map data, please change this name, to build new chache
-        .setProfiles(new Profile("foot").setVehicle("foot").setWeighting("fastest"))
+        .setProfiles(new Profile(Props.GRASSHOPPER_PROFILE).setVehicle("foot").setWeighting("shortest"))
         .importOrLoad();
   }
 
@@ -49,7 +47,7 @@ public class RouteService {
   public List<PointDTO> snapPointsOnRoadGrid(List<PointDTO> perfectCircle) {
     List<PointDTO> snapped = new ArrayList<>();
     for (PointDTO p : perfectCircle) {
-      GHRequest req = new GHRequest(p.latitude, p.longitude, p.latitude, p.longitude).setProfile("foot");
+      GHRequest req = new GHRequest(p.latitude, p.longitude, p.latitude, p.longitude).setProfile(Props.GRASSHOPPER_PROFILE);
       GHResponse rsp = hopper.route(req);
 
       if (!rsp.hasErrors()) {
@@ -105,7 +103,7 @@ public class RouteService {
       PointDTO from = snappedPoints.get(i);
       PointDTO to = snappedPoints.get(i + 1);
 
-      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile("foot");
+      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile(Props.GRASSHOPPER_PROFILE);
       GHResponse rsp = hopper.route(req);
 
       if (!rsp.hasErrors()) {
@@ -120,7 +118,7 @@ public class RouteService {
     // close the loop
     PointDTO first = snappedPoints.get(0);
     PointDTO last = snappedPoints.get(snappedPoints.size() - 1);
-    GHRequest req = new GHRequest(last.latitude, last.longitude, first.latitude, first.longitude).setProfile("foot");
+    GHRequest req = new GHRequest(last.latitude, last.longitude, first.latitude, first.longitude).setProfile(Props.GRASSHOPPER_PROFILE);
     GHResponse rsp = hopper.route(req);
     if (!rsp.hasErrors()) {
       ResponsePath path = rsp.getBest();

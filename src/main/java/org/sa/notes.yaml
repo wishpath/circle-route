@@ -1,5 +1,4 @@
 problems:
-  - shift not 50% %50 ab, but each time by 25% (this can change course direction as well in the same step)
   - can force turn on highway to required directions
   - sliding efficiency window:
     - start small like 100m and increment up to 25percent of route. by 100m step
