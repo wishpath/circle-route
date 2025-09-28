@@ -2,6 +2,7 @@ package org.sa;
 
 import org.sa.config.Props;
 import org.sa.service.GeoUtils;
+import org.sa.service.GraphHopperService;
 import org.sa.service.OutputService;
 import org.sa.service.RouteService;
 
@@ -11,17 +12,18 @@ public class Main {
 
   public static void main(String[] args) {
     RouteService routeService = new RouteService();
+    GraphHopperService graphHopperService = new GraphHopperService();
     OutputService outputService = new OutputService();
     //loop center points that i want to try here, but for now just go with one point:
     PointDTO routeCenterPoint = routeService.movePoint(Props.CIRCLE_CENTER, 2.0, -0.7);
     List<PointDTO> perfectCirclePoints = routeService.generatePerfectCirclePoints(routeCenterPoint, 25, 2);
     System.out.println("perfect circle points: " + perfectCirclePoints.size());
-    List<PointDTO> circlePointsSnappedOnRoad = routeService.snapPointsOnRoadGrid(perfectCirclePoints);
+    List<PointDTO> circlePointsSnappedOnRoad = graphHopperService.snapPointsOnRoadGrid(perfectCirclePoints);
     System.out.println("snapped on road points: " + circlePointsSnappedOnRoad.size());
-    List<PointDTO> routed = routeService.connectSnappedPointsWithRoutes(circlePointsSnappedOnRoad);
+    List<PointDTO> routed = graphHopperService.connectSnappedPointsWithRoutes(circlePointsSnappedOnRoad);
     System.out.println("routed points: " + routed.size());
 
-    List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routeService, routed);
+    List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(graphHopperService, routeService, routed);
 
     //efficiency measurement
     double routeLength = Math.round(GeoUtils.getRouteDistanceKm(noLoopRoutedPoints) * 100.0) / 100.0;
@@ -46,11 +48,11 @@ public class Main {
     outputService.outputGpxWaypoints(noLoopRoutedPoints);
   }
 
-  private static List<PointDTO> removeLoopsByLoopingTheSameActions(RouteService service, List<PointDTO> routePoints) {
+  private static List<PointDTO> removeLoopsByLoopingTheSameActions(GraphHopperService graphHopperService, RouteService service, List<PointDTO> routePoints) {
     double indicatorOfLoop_maxDistance_loopStart_loopFinish_km = 0.2;
     List<PointDTO> noLoops = service.removeLoops(routePoints, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
     System.out.println("1 loops cut: " + noLoops.size());
-    List<PointDTO> noLoopsRouted = service.connectSnappedPointsWithRoutes(noLoops); //reroute to fix loop cuts
+    List<PointDTO> noLoopsRouted = graphHopperService.connectSnappedPointsWithRoutes(noLoops); //reroute to fix loop cuts
     System.out.println("1 rerout: " + noLoopsRouted.size());
     List<PointDTO> shifted = service.shiftABtoBA_andReverse(noLoopsRouted);
     System.out.println("1 shifted: " + shifted.size());
@@ -59,7 +61,7 @@ public class Main {
       System.out.println();
       noLoops = service.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
       System.out.println(i + " loops cut: " + noLoops.size());
-      noLoopsRouted = service.connectSnappedPointsWithRoutes(noLoops);
+      noLoopsRouted = graphHopperService.connectSnappedPointsWithRoutes(noLoops);
       System.out.println(i + " rerout: " + noLoopsRouted.size());
       shifted = service.shiftABtoBA_andReverse(noLoopsRouted);
       System.out.println(i + " shifted: " + shifted.size());
