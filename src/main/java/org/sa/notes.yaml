@@ -6,7 +6,6 @@ problems:
         - reroute start and end of this window (using multiple profiles like "running, cycling, car, motorcycle", maybe some of them only)
           - if rerouting would impact course efficiency positively - keep the new routing. get a new window after injected part.
           - else keep sliding
-  - change map data to remove limitations? like highway, road and everything to path, so the only thing that matters for path is composition
 
 get maps:
   - small portions of map, smaller than Lithuania:

@@ -47,7 +47,7 @@ public class Main {
   }
 
   private static List<PointDTO> removeLoopsByLoopingTheSameActions(RouteService service, List<PointDTO> routePoints) {
-    double indicatorOfLoop_maxDistance_loopStart_loopFinish_km = 0.035;
+    double indicatorOfLoop_maxDistance_loopStart_loopFinish_km = 0.2;
     List<PointDTO> noLoops = service.removeLoops(routePoints, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
     System.out.println("1 loops cut: " + noLoops.size());
     List<PointDTO> noLoopsRouted = service.connectSnappedPointsWithRoutes(noLoops); //reroute to fix loop cuts
@@ -55,7 +55,7 @@ public class Main {
     List<PointDTO> shifted = service.shiftABtoBA_andReverse(noLoopsRouted);
     System.out.println("1 shifted: " + shifted.size());
 
-    for (int i = 2; i < 8; i++, indicatorOfLoop_maxDistance_loopStart_loopFinish_km /= 1.5) {
+    for (int i = 2; i < 8; i++, indicatorOfLoop_maxDistance_loopStart_loopFinish_km /= 2) {
       System.out.println();
       noLoops = service.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
       System.out.println(i + " loops cut: " + noLoops.size());
