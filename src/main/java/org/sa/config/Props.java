@@ -20,4 +20,7 @@ public class Props {
 
   //routing preferences
   public static String GRASSHOPPER_PROFILE = "free"; //can be "foot" | delete cache when changed
+
+  //output dir
+  public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/output-gpx";
 }

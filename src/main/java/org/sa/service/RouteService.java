@@ -8,10 +8,6 @@ import java.util.List;
 
 public class RouteService {
 
-
-
-
-
   public List<PointDTO> generatePerfectCirclePoints(PointDTO center, double circleLengthKm, double maxDistanceBetweenPointsKm) {
     double earthRadiusKm = 6371.0;
     double radiusKm = circleLengthKm / (2 * Math.PI);

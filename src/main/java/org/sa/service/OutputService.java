@@ -9,12 +9,11 @@ import java.io.IOException;
 import java.util.List;
 
 public class OutputService {
-  public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/output-gpx";
 
   public void outputGpxWaypoints(List<PointDTO> points) { //for the display of points on the map rather than continuous route
     //overwrites
     try {
-      File dir = new File(GPX_OUTPUT_DIR);
+      File dir = new File(Props.GPX_OUTPUT_DIR);
       if (!dir.exists()) dir.mkdirs();
 
       File gpxFile = new File(dir, Props.DATA_NAME + "-circle-waypoints.gpx");
@@ -40,7 +39,7 @@ public class OutputService {
 
   public void outputGPX(List<PointDTO> circlePointsSnappedOnRoad) { //overwrites
     try {
-      File dir = new File(GPX_OUTPUT_DIR);
+      File dir = new File(Props.GPX_OUTPUT_DIR);
       if (!dir.exists()) dir.mkdirs();
 
       File gpxFile = new File(dir, Props.DATA_NAME + "-circle-route.gpx");

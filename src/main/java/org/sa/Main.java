@@ -1,7 +1,7 @@
 package org.sa;
 
+import org.sa.APPS.GPXRouteEfficiencyEvaluator;
 import org.sa.config.Props;
-import org.sa.service.GeoUtils;
 import org.sa.service.GraphHopperService;
 import org.sa.service.OutputService;
 import org.sa.service.RouteService;
@@ -14,7 +14,10 @@ public class Main {
     RouteService routeService = new RouteService();
     GraphHopperService graphHopperService = new GraphHopperService();
     OutputService outputService = new OutputService();
-    //loop center points that i want to try here, but for now just go with one point:
+
+    //implement loop of center points and lengths here later
+
+
     PointDTO routeCenterPoint = routeService.movePoint(Props.CIRCLE_CENTER, 2.0, -0.7);
     List<PointDTO> perfectCirclePoints = routeService.generatePerfectCirclePoints(routeCenterPoint, 25, 2);
     System.out.println("perfect circle points: " + perfectCirclePoints.size());
@@ -25,27 +28,12 @@ public class Main {
 
     List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(graphHopperService, routeService, routed);
 
-    //efficiency measurement
-    double routeLength = Math.round(GeoUtils.getRouteDistanceKm(noLoopRoutedPoints) * 100.0) / 100.0;
-    double routeAreaKm = Math.round(GeoUtils.getRouteAreaKm(noLoopRoutedPoints) * 100.0) / 100.0;
-    double idealAreaKm = Math.round(GeoUtils.getCircleAreaByLength(routeLength) * 100.0) / 100.0;
-    double perfectSquareAreaKm = Math.round((routeLength * routeLength / 16) * 100.0) / 100.0;
-    double routeAreaPerKm = Math.round((routeAreaKm / routeLength) * 100.0) / 100.0;
-    double ideaAreaPerKm = Math.round((idealAreaKm / routeLength) * 100.0) / 100.0;
-    int efficiencyPercent = (int)(routeAreaKm/idealAreaKm*100);
-    int perfectSquareEfficiencyPercent = (int)(perfectSquareAreaKm/idealAreaKm*100);
-    System.out.println(
-      "\nEFFICIENCY: " +
-      "\nLength: " + routeLength +
-      " km\nArea: " + routeAreaKm +
-      " sq.km\nArea per 1km: " + routeAreaPerKm +
-      " sq.km/1km\nFor this length ideally area would be: " + idealAreaKm +
-      " sq.km\nFor this length ideally area per 1km would be: " + ideaAreaPerKm +
-      " sq.km/1km\nEfficiency for this length: " + efficiencyPercent +
-      "%\nEfficiency of perfect square for this length would be: " + perfectSquareEfficiencyPercent + "%\n\n"
-      );
+    //output
     outputService.outputGPX(noLoopRoutedPoints);
     outputService.outputGpxWaypoints(noLoopRoutedPoints);
+
+    //printout efficiency parameters
+    GPXRouteEfficiencyEvaluator.evaluateGPXRoutesInDirectory(Props.GPX_OUTPUT_DIR);
   }
 
   private static List<PointDTO> removeLoopsByLoopingTheSameActions(GraphHopperService graphHopperService, RouteService service, List<PointDTO> routePoints) {
