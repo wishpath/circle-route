@@ -4,6 +4,7 @@ import org.sa.APPS.GPXRouteEfficiencyEvaluator;
 import org.sa.config.Props;
 import org.sa.service.GraphHopperService;
 import org.sa.service.OutputService;
+import org.sa.service.RouteImprovingService;
 import org.sa.service.RouteService;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public class Main {
     RouteService routeService = new RouteService();
     GraphHopperService graphHopperService = new GraphHopperService();
     OutputService outputService = new OutputService();
+    RouteImprovingService routeImprovingService = new RouteImprovingService(graphHopperService);
 
     //implement loop of center points and lengths here later
 
