@@ -25,10 +25,6 @@ public class RouteService {
     return points;
   }
 
-
-
-
-
   public List<PointDTO> removeLoops(List<PointDTO> routedPoints, double indicatorOfLoop_maxDistance_loopStart_loopFinish) {
     List<PointDTO> cleaned = new ArrayList<>();
     if (routedPoints.isEmpty()) return cleaned;
@@ -86,7 +82,7 @@ public class RouteService {
     List<PointDTO> secondHalf = points.subList(mid, points.size());
     List<PointDTO> result = new ArrayList<>(secondHalf);
     result.addAll(firstHalf);
-    Collections.reverse(points);
+    Collections.reverse(result);
     return result;
   }
 

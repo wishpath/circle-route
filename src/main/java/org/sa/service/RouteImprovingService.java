@@ -79,12 +79,15 @@ public class RouteImprovingService {
 
     double reroutedCrustLength = GeoUtils.getCurveDistanceNoClosing(reroutedWindow);
 
+
     double originalPizzaSliceArea = GeoUtils.getPizzaSliceAreaKm(originalWindow, centerPoint);
     double reroutedPizzaSliceArea = GeoUtils.getPizzaSliceAreaKm(reroutedWindow, centerPoint);
 
     double reroutedEfficiencySqKm = reroutedPizzaSliceArea / reroutedCrustLength;
     double originalEfficiencySqKm = originalPizzaSliceArea / originalCrustLength;
+    if (reroutedCrustLength != originalCrustLength) System.out.println("FOUND ALTERNATIVE REROUTING " + reroutedCrustLength + " " + originalCrustLength + " " + reroutedEfficiencySqKm + " " + originalEfficiencySqKm);
 
+    if (reroutedEfficiencySqKm > originalEfficiencySqKm) System.out.println("FOUND BETTER REROUTING");
     return reroutedEfficiencySqKm > originalEfficiencySqKm;
   }
 }

@@ -84,7 +84,9 @@ public class GeoUtils {
   }
 
   public static double getPizzaSliceAreaKm(List<PointDTO> pizzaCrust, PointDTO pizzaCenter) {
-    List<PointDTO> pizzaSlice = new ArrayList<>(pizzaCrust);
+    List<PointDTO> pizzaSlice = new ArrayList<>();
+    pizzaSlice.add(pizzaCenter);
+    pizzaSlice.addAll(pizzaCrust);
     pizzaSlice.add(pizzaCenter);
     return getRouteAreaKm(pizzaSlice);
   }

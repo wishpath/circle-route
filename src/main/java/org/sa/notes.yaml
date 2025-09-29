@@ -1,10 +1,6 @@
 problems:
   - sliding efficiency window:
-    - start small like 200m and increment up to 25percent of route. by 200m step
-      - slide this window through all route
-        - reroute start and end of this window (using multiple profiles like "running, cycling, car, motorcycle", maybe some of them only)
-          - if rerouting would impact course efficiency positively - keep the new routing. get a new window after injected part.
-          - else keep sliding
+    - try "gravel bike" profile, try rerouting to opposite direction
 
 get maps:
   - small portions of map, smaller than Lithuania:
