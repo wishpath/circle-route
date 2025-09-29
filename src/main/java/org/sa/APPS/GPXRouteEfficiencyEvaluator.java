@@ -46,7 +46,7 @@ public class GPXRouteEfficiencyEvaluator {
 
       if (!routePoints.get(0).equals(routePoints.get(routePoints.size() - 1))) routePoints.add(routePoints.get(0));
 
-      double routeLength = round2(GeoUtils.getRouteDistanceKm(routePoints));
+      double routeLength = round2(GeoUtils.autoCloseRouteAndGetLengthKm(routePoints));
       double routeAreaKm = round2(GeoUtils.getRouteAreaKm(routePoints));
       double idealAreaKm = round2(GeoUtils.getCircleAreaByLength(routeLength));
       double perfectSquareAreaKm = round2(routeLength * routeLength / 16);

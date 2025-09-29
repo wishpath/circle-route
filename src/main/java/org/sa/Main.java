@@ -19,7 +19,6 @@ public class Main {
 
     //implement loop of center points and lengths here later
 
-
     PointDTO routeCenterPoint = routeService.movePoint(Props.CIRCLE_CENTER, 2.0, -0.7);
     List<PointDTO> perfectCirclePoints = routeService.generatePerfectCirclePoints(routeCenterPoint, 25, 2);
     System.out.println("perfect circle points: " + perfectCirclePoints.size());

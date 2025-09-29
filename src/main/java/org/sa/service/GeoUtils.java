@@ -2,6 +2,7 @@ package org.sa.service;
 
 import org.sa.PointDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GeoUtils {
@@ -31,11 +32,18 @@ public class GeoUtils {
     return earthRadiusKm * angularDistance;
   }
 
-  public static double getRouteDistanceKm(List<PointDTO> route) {
-    return getRouteDistanceKm(route, 0, route.size() - 1);
+  public static double autoCloseRouteAndGetLengthKm(List<PointDTO> route) {
+    if (route.size() < 2) return 0.0;
+    double distanceWithoutClosing = getCurveDistanceNoClosing(route);
+    double closingDistance = getDistanceBetweenLocations(route.get(route.size() - 1), route.get(0));
+    return distanceWithoutClosing + closingDistance;
   }
 
-  public static double getRouteDistanceKm(List<PointDTO> route, int fromIndex, int toIndex) {
+  public static double getCurveDistanceNoClosing(List<PointDTO> route) {
+    return getCurveDistanceNoClosing(route, 0, route.size() - 1);
+  }
+
+  public static double getCurveDistanceNoClosing(List<PointDTO> route, int fromIndex, int toIndex) {
     double totalDistance = 0.0;
     for (int i = fromIndex; i < toIndex; i++)
       totalDistance += getDistanceBetweenLocations(route.get(i), route.get(i + 1));
@@ -73,6 +81,12 @@ public class GeoUtils {
 
   public static double getCircleAreaByLength(double circleLength) {
     return (circleLength * circleLength) / (4 * Math.PI);
+  }
+
+  public static double getPizzaSliceAreaKm(List<PointDTO> pizzaCrust, PointDTO pizzaCenter) {
+    List<PointDTO> pizzaSlice = new ArrayList<>(pizzaCrust);
+    pizzaSlice.add(pizzaCenter);
+    return getRouteAreaKm(pizzaSlice);
   }
 }
 

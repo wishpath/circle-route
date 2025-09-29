@@ -1,6 +1,7 @@
 package org.sa.service;
 
 import org.sa.PointDTO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class RouteImprovingService {
   /**
    * Analyze route with a sliding window of specified length in kilometers.
    */
-  public List<PointDTO> improveRouteBySlidingWindow(List<PointDTO> routePoints, double windowSizeKm) {
+  public List<PointDTO> improveRouteBySlidingWindow(List<PointDTO> routePoints, double windowSizeKm, PointDTO centerPoint) {
     List<PointDTO> behind = new ArrayList<>();
 
     //build window and keep track : start, end, points and distance
@@ -32,7 +33,7 @@ public class RouteImprovingService {
     while (startIndex < routePoints.size() - 1) {
       List<PointDTO> reroutedWindow = rerouteFirstAndLastPoints(routePoints, startIndex, endIndex);
 
-      if (isReroutedWindowBetter(reroutedWindow, window, accumulatedDistance)) {
+      if (isReroutedWindowBetter(reroutedWindow, window, accumulatedDistance, centerPoint)) {
         behind.addAll(reroutedWindow);
         accumulatedDistance = 0.0;
         startIndex = endIndex + 1;
@@ -73,23 +74,17 @@ public class RouteImprovingService {
     return graphHopperService.connectSnappedPointsWithRoutes(List.of(routePoints.get(startIndex), routePoints.get(endIndex)));
   }
 
-  private boolean isReroutedWindowBetter(List<PointDTO> reroutedWindow, List<PointDTO> window, double accumulatedDistance) {
-    //rerouted length = graphHopperService... get length
-    //main length = accumulatedDistance
+  private boolean isReroutedWindowBetter(List<PointDTO> reroutedWindow, List<PointDTO> originalWindow,
+                                         double originalCrustLength, PointDTO centerPoint) {
 
+    double reroutedCrustLength = GeoUtils.getCurveDistanceNoClosing(reroutedWindow);
 
-    //center point needed to formulate pizza slices
-    //graphHopper needs extra method to calculate pizza slice area
+    double originalPizzaSliceArea = GeoUtils.getPizzaSliceAreaKm(originalWindow, centerPoint);
+    double reroutedPizzaSliceArea = GeoUtils.getPizzaSliceAreaKm(reroutedWindow, centerPoint);
 
-    //rerouted pizza slice area
-    //main pizza slice area
+    double reroutedEfficiencySqKm = reroutedPizzaSliceArea / reroutedCrustLength;
+    double originalEfficiencySqKm = originalPizzaSliceArea / originalCrustLength;
 
-    //rerouted efficiency (sq.km /route length km)
-    //main efficiency (sq.km /route length km)
-
-    //return rerouted efficiency > main efficiency
-
-    throw new IllegalStateException("implement this");
+    return reroutedEfficiencySqKm > originalEfficiencySqKm;
   }
-
 }

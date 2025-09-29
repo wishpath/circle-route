@@ -32,7 +32,7 @@ public class RouteService {
   public List<PointDTO> removeLoops(List<PointDTO> routedPoints, double indicatorOfLoop_maxDistance_loopStart_loopFinish) {
     List<PointDTO> cleaned = new ArrayList<>();
     if (routedPoints.isEmpty()) return cleaned;
-    double routedPointsTotalDistance = GeoUtils.getRouteDistanceKm(routedPoints);
+    double routedPointsTotalDistance = GeoUtils.autoCloseRouteAndGetLengthKm(routedPoints);
     double loopSizeThreshold = routedPointsTotalDistance * 0.3;
 
     int i = 0;
@@ -47,7 +47,7 @@ public class RouteService {
         i++;
       }
       else {
-        boolean isLoopBig = GeoUtils.getRouteDistanceKm(routedPoints, i, loopEndingIndex) > loopSizeThreshold; // computationally expensive!!!
+        boolean isLoopBig = GeoUtils.getCurveDistanceNoClosing(routedPoints, i, loopEndingIndex) > loopSizeThreshold; // computationally expensive!!!
         if (isLoopBig) { //if loop is big, still don't cut it
           cleaned.add(routedPoints.get(i));
           i++;
