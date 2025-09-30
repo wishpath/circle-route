@@ -17,6 +17,7 @@ import java.util.List;
 public class GPXRouteEfficiencyEvaluator {
 
   private static final String GPX_FOLDER = "src/main/java/org/sa/APPS/gpx_files_to_evaluate";
+//  private static final String GPX_FOLDER = "src/main/java/org/sa/output-gpx";
 
   // ANSI escape codes
   private static final String BLUE = "\u001B[34m";
@@ -55,6 +56,8 @@ public class GPXRouteEfficiencyEvaluator {
       int efficiencyPercent = (int)(routeAreaKm / idealAreaKm * 100);
       int perfectSquareEfficiencyPercent = (int)(perfectSquareAreaKm / idealAreaKm * 100);
 
+
+      if (efficiencyPercent < 52) continue;
       System.out.println(
           BLUE + "File: " + gpxFile.getName() + RESET +
               "\nLength: " + routeLength + " km" +
