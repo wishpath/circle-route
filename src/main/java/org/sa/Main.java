@@ -17,16 +17,13 @@ public class Main {
 
     int circleCounter = 0;
     PointDTO areaCenterPoint = routeService.movePoint(Props.CIRCLE_CENTER, 2.0, -0.7);
-    PointDTO initialRouteCenterPoint = routeService.movePoint(areaCenterPoint, -2.5, -2.5);
-    for (double north = 0; north < 5; north += 0.5) //10 instances
-      for (double east = 0; east < 5; east += 0.5, circleCounter++) {//10 instances
+    PointDTO initialRouteCenterPoint = routeService.movePoint(areaCenterPoint, 0, 0);
+    for (double north = 0; north <= 0; north += 0.5)
+      for (double east = 0; east <= 0; east += 0.5, circleCounter++) {
         System.out.println(circleCounter);
         PointDTO iterationCenterPoint = routeService.movePoint(initialRouteCenterPoint, north, east);
         generateRoute(routeService, iterationCenterPoint, graphHopperService, routeImprovingService, outputService, circleCounter);
       }
-
-
-
   }
 
   private static void generateRoute(RouteService routeService, PointDTO routeCenterPoint, GraphHopperService graphHopperService, RouteImprovingService routeImprovingService, OutputService outputService, int circleCounter) {
