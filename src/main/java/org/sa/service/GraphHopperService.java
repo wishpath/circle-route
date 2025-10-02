@@ -19,7 +19,12 @@ public class GraphHopperService {
     hopper = new GraphHopper()
         .setOSMFile(Props.MAP_DATA_PATH)
         .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
-        .setProfiles(new Profile(Props.GRASSHOPPER_PROFILE).setVehicle("foot").setWeighting("shortest"))
+        .setProfiles(
+            new Profile("foot_shortest").setVehicle("foot").setWeighting("shortest"),
+            new Profile("bike_shortest").setVehicle("bike").setWeighting("shortest"),
+            new Profile("motorbike_shortest").setVehicle("motorcycle").setWeighting("shortest"),
+            new Profile("car_shortest").setVehicle("car").setWeighting("shortest")
+        )
         .importOrLoad();
   }
 
