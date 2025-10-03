@@ -15,7 +15,7 @@ public class RouteImprovingService {
   /**
    * Analyze route with a sliding window of specified length in kilometers.
    */
-  public List<PointDTO> improveRouteBySlidingWindow(List<PointDTO> routePoints, double windowSizeKm, PointDTO centerPoint) {
+  public List<PointDTO> improveRouteBySlidingWindow(List<PointDTO> routePoints, double windowSizeKm, PointDTO centerPoint, String profile) {
     List<PointDTO> behind = new ArrayList<>();
 
     //build window and keep track : start, end, points and distance
@@ -23,6 +23,8 @@ public class RouteImprovingService {
     double accumulatedDistance = 0.0;
     if (routePoints.size() < 2) throw new RuntimeException("short list");
     int endIndex = startIndex + 1; // so window should never be empty
+
+
     // Expand window until distance reaches windowSizeKm or end of route
     while (endIndex < routePoints.size() - 1 && accumulatedDistance < windowSizeKm) {
       accumulatedDistance += GeoUtils.getDistanceBetweenLocations(routePoints.get(endIndex), routePoints.get(endIndex + 1));
@@ -31,7 +33,7 @@ public class RouteImprovingService {
     List<PointDTO> window = routePoints.subList(startIndex, endIndex);
 
     while (startIndex < routePoints.size() - 1) {
-      List<PointDTO> reroutedWindow = rerouteFirstAndLastPoints(routePoints, startIndex, endIndex);
+      List<PointDTO> reroutedWindow = rerouteFirstAndLastPoints(routePoints, startIndex, endIndex, profile);
 
       if (isReroutedWindowBetter(reroutedWindow, window, accumulatedDistance, centerPoint)) {
         behind.addAll(reroutedWindow);
@@ -70,8 +72,9 @@ public class RouteImprovingService {
     return behind;
   }
 
-  private List<PointDTO> rerouteFirstAndLastPoints(List<PointDTO> routePoints, int startIndex, int endIndex) {
-    return graphHopperService.connectSnappedPointsWithRoutes(List.of(routePoints.get(startIndex), routePoints.get(endIndex)));
+  private List<PointDTO> rerouteFirstAndLastPoints(List<PointDTO> routePoints, int startIndex, int endIndex, String profile) {
+    List<PointDTO> firstAndLastPoints = List.of(routePoints.get(startIndex), routePoints.get(endIndex));
+    return graphHopperService.connectSnappedPointsWithRoutes(firstAndLastPoints, profile);
   }
 
   private boolean isReroutedWindowBetter(List<PointDTO> reroutedWindow, List<PointDTO> originalWindow,
