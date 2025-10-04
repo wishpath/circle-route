@@ -18,9 +18,6 @@ public class GPXRouteEfficiencyEvaluator {
 
   private static final String GPX_FOLDER = "src/main/java/org/sa/APPS/gpx_files_to_evaluate";
 //  private static final String GPX_FOLDER = "src/main/java/org/sa/output-gpx";
-
-
-  ---
   // ANSI escape codes
   private static final String BLUE = "\u001B[34m";
   private static final String RED = "\u001B[31m";

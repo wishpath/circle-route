@@ -17,7 +17,7 @@ public class GraphHopperService {
 
   static {
     hopper = new GraphHopper()
-        .setOSMFile(Props.MAP_DATA_PATH)
+        .setOSMFile("src/main/java/org/sa/map-data/lithuania-250930.osm.pbf")
         .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
         .setProfiles(
             new Profile(Props.GRASSHOPPER_PROFILE1_FOOT_SHORTEST).setVehicle("foot").setWeighting("shortest"),
