@@ -1,9 +1,8 @@
 package org.sa.APPS;
 
-import org.sa.config.Props;
-
 import javax.xml.stream.*;
-import javax.xml.stream.events.*;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -18,12 +17,12 @@ import java.io.FileOutputStream;
 public class MapDataModifier {
 
   public static void main(String[] args) {
-    preprocessOsm(Props.ROKISKIS_MAP_DATA_PATH, Props.ROKISKIS_MAP_DATA_PATH_FREE);
+    preprocessOsm();
   }
 
-  public static void preprocessOsm(String inputPath, String outputPath) {
-    try (FileInputStream fis = new FileInputStream(inputPath);
-         FileOutputStream fos = new FileOutputStream(outputPath)) {
+  public static void preprocessOsm() {
+    try (FileInputStream fis = new FileInputStream("src/main/java/org/sa/map-data/lithuania-250930.osm.pbf");
+         FileOutputStream fos = new FileOutputStream("src/main/java/org/sa/map-data/lithuania-250930_free.osm.pbf")) {
 
       XMLInputFactory inputFactory = XMLInputFactory.newInstance();
       XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
@@ -108,7 +107,7 @@ public class MapDataModifier {
       writer.close();
       reader.close();
 
-      System.out.println("✅ OSM preprocessing complete: " + outputPath);
+      System.out.println("✅ OSM preprocessing complete");
       System.out.println("Total ways processed: " + wayCount);
 
     } catch (Exception e) {

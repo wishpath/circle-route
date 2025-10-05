@@ -14,6 +14,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("com.graphhopper:graphhopper-core:7.0")
     implementation("org.slf4j:slf4j-simple:2.0.7")
+    implementation("org.locationtech.jts:jts-core:1.20.0")
 }
 
 tasks.test {
