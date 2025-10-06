@@ -126,5 +126,30 @@ public class GeoUtils {
     return offsetPoints;
   }
 
+  public static boolean isWithinPolygon(List<PointDTO> polygon, double latitude, double longitude) {
+    if (polygon.size() < 3) return false;
+
+    GeometryFactory geometryFactory = new GeometryFactory();
+
+    // Ensure polygon is closed
+    List<PointDTO> closedPolygon = new ArrayList<>(polygon);
+    if (!closedPolygon.get(0).equals(closedPolygon.get(closedPolygon.size() - 1)))
+      closedPolygon.add(closedPolygon.get(0));
+
+    // Convert to JTS Coordinates
+    Coordinate[] coords = closedPolygon.stream()
+        .map(p -> new Coordinate(p.longitude, p.latitude))
+        .toArray(Coordinate[]::new);
+
+    LinearRing shell = geometryFactory.createLinearRing(coords);
+    Polygon jtsPolygon = geometryFactory.createPolygon(shell, null);
+
+    // Create point
+    Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+
+    // Check if point is inside polygon (true if inside or on boundary)
+    return jtsPolygon.covers(point);
+  }
+
 }
 

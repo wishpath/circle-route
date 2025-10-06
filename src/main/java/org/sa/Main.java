@@ -1,33 +1,15 @@
 package org.sa;
 
+import org.sa.APPS.LithuaniaTraverser;
 import org.sa.config.Props;
 import org.sa.service.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-
   public static void main(String[] args) {
-    RouteService routeService = new RouteService();
-    GraphHopperService graphHopperService = new GraphHopperService();
-    OutputService outputService = new OutputService();
-    RouteImprovingService routeImprovingService = new RouteImprovingService(graphHopperService);
-
-    List<PointDTO> lithuaniaContour = InputService.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_contour_rough.gpx"));
-    List<PointDTO> ltOffset = GeoUtils.offsetPolygonInwards(lithuaniaContour, 20.0);
-    outputService.outputGPX(ltOffset, 0);
-
-//    int circleCounter = 0;
-//    PointDTO areaCenterPoint = routeService.movePoint(Props.CIRCLE_CENTER, 2.0, -0.7);
-//    PointDTO initialRouteCenterPoint = routeService.movePoint(areaCenterPoint, 0, 0);
-//    for (double north = 0; north <= 0; north += 0.5)
-//      for (double east = 0; east <= 0; east += 0.5, circleCounter++) {
-//        System.out.println(circleCounter);
-//        PointDTO iterationCenterPoint = routeService.movePoint(initialRouteCenterPoint, north, east);
-//        generateRoute(routeService, iterationCenterPoint, graphHopperService, routeImprovingService, outputService, circleCounter);
-//      }
+    new LithuaniaTraverser().traverse();
   }
 
   private static void generateRoute(RouteService routeService, PointDTO routeCenterPoint, GraphHopperService graphHopperService, RouteImprovingService routeImprovingService, OutputService outputService, int circleCounter) {
