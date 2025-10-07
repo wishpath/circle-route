@@ -97,7 +97,7 @@ public class GeoUtils {
   public static Polygon offsetPolygonInwards(Polygon jtsPolygon, double offsetValueKm) {
     // Offset inward (negative distance)
     BufferParameters params = new BufferParameters();
-    params.setJoinStyle(BufferParameters.JOIN_ROUND); // rounded corners
+    params.setJoinStyle(BufferParameters.JOIN_BEVEL); // Straight truncation of corners — minimal computation
     Geometry offsetGeom = BufferOp.bufferOp(jtsPolygon, -offsetValueKm / 111.32, params);
     return (Polygon) offsetGeom;
   }

@@ -33,26 +33,12 @@ public class LithuaniaTraverser {
     long totalInstances = 0;
     long lithuaniaInstances = 0;
 
-    // validate lithuania contour
-    List<PointDTO> lithuaniaContour = InputService.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_super_rough_closed_contour.gpx"));
-    if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
-    List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
-    if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))
-      lithuaniaContourClosed.add(lithuaniaContourClosed.get(0));
-    // transform lithuania contour
-
-    Coordinate[] coords = lithuaniaContourClosed.stream()
-        .map(p -> new Coordinate(p.longitude, p.latitude))
-        .toArray(Coordinate[]::new);
-    GeometryFactory geometryFactory = new GeometryFactory();
-    LinearRing shell = geometryFactory.createLinearRing(coords);
-    Polygon jtsPolygon = geometryFactory.createPolygon(shell, null);
-
+    Polygon lithuaniaContour = getLithuaniaContour();
     LocalDateTime start = LocalDateTime.now();
     outer:
     for (double circleLength = CIRCLE_LENGTH_MIN; circleLength <= CIRCLE_LENGTH_MAX; circleLength += CIRCLE_LENGTH_STEP) {
 
-      Polygon ltOffset = GeoUtils.offsetPolygonInwards(jtsPolygon, circleLength / 2);
+      Polygon ltOffset = GeoUtils.offsetPolygonInwards(lithuaniaContour, circleLength / 2);
       for (double latitude = LITHUANIA_MIN_LAT; latitude <= LITHUANIA_MAX_LAT; latitude += LT_GRID_STEP_KM * LAT_STEP_1000_M) {
         for (double longitude = LITHUANIA_MIN_LON; longitude <= LITHUANIA_MAX_LON; longitude += LT_GRID_STEP_KM * LON_STEP_1000_M) {
           totalInstances++; //325 458
@@ -69,5 +55,22 @@ public class LithuaniaTraverser {
         "Total points: " + totalInstances +
         ", inside Lithuania: " + lithuaniaInstances +
         ", duration: " + (int) java.time.Duration.between(start, LocalDateTime.now()).toSeconds() + " seconds");
+  }
+
+  private static Polygon getLithuaniaContour() {
+    // validate lithuania contour
+    List<PointDTO> lithuaniaContour = InputService.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_super_rough_closed_contour.gpx"));
+    if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
+    List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
+    if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))
+      lithuaniaContourClosed.add(lithuaniaContourClosed.get(0));
+    // transform format of lithuania contour
+    Coordinate[] coords = lithuaniaContourClosed.stream()
+        .map(p -> new Coordinate(p.longitude, p.latitude))
+        .toArray(Coordinate[]::new);
+    GeometryFactory geometryFactory = new GeometryFactory();
+    LinearRing shell = geometryFactory.createLinearRing(coords);
+    Polygon jtsPolygon = geometryFactory.createPolygon(shell, null);
+    return jtsPolygon;
   }
 }
