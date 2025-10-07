@@ -1,10 +1,15 @@
 package org.sa.APPS;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Polygon;
 import org.sa.PointDTO;
 import org.sa.service.*;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LithuaniaTraverser {
@@ -27,12 +32,27 @@ public class LithuaniaTraverser {
   public void traverse() {
     long totalInstances = 0;
     long lithuaniaInstances = 0;
-    List<PointDTO> lithuaniaContour = InputService.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_contour_rough.gpx"));
+
+    // validate lithuania contour
+    List<PointDTO> lithuaniaContour = InputService.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_super_rough_closed_contour.gpx"));
+    if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
+    List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
+    if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))
+      lithuaniaContourClosed.add(lithuaniaContourClosed.get(0));
+    // transform lithuania contour
+
+    Coordinate[] coords = lithuaniaContourClosed.stream()
+        .map(p -> new Coordinate(p.longitude, p.latitude))
+        .toArray(Coordinate[]::new);
+    GeometryFactory geometryFactory = new GeometryFactory();
+    LinearRing shell = geometryFactory.createLinearRing(coords);
+    Polygon jtsPolygon = geometryFactory.createPolygon(shell, null);
 
     LocalDateTime start = LocalDateTime.now();
     outer:
     for (double circleLength = CIRCLE_LENGTH_MIN; circleLength <= CIRCLE_LENGTH_MAX; circleLength += CIRCLE_LENGTH_STEP) {
-      List<PointDTO> ltOffset = GeoUtils.offsetPolygonInwards(lithuaniaContour, circleLength / 2);
+
+      Polygon ltOffset = GeoUtils.offsetPolygonInwards(jtsPolygon, circleLength / 2);
       for (double latitude = LITHUANIA_MIN_LAT; latitude <= LITHUANIA_MAX_LAT; latitude += LT_GRID_STEP_KM * LAT_STEP_1000_M) {
         for (double longitude = LITHUANIA_MIN_LON; longitude <= LITHUANIA_MAX_LON; longitude += LT_GRID_STEP_KM * LON_STEP_1000_M) {
           totalInstances++; //325 458

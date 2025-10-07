@@ -94,61 +94,17 @@ public class GeoUtils {
     return getRouteAreaKm(pizzaSlice);
   }
 
-  public static List<PointDTO> offsetPolygonInwards(List<PointDTO> polygon, double offsetValueKm) {
-    GeometryFactory geometryFactory = new GeometryFactory();
-    if (polygon.size() < 3) return new ArrayList<>(polygon);
-
-    // Ensure polygon is closed
-    List<PointDTO> closedPolygon = new ArrayList<>(polygon);
-    if (!closedPolygon.get(0).equals(closedPolygon.get(closedPolygon.size() - 1)))
-      closedPolygon.add(closedPolygon.get(0));
-
-    // Convert PointDTO -> JTS Coordinates
-    Coordinate[] coords = closedPolygon.stream()
-        .map(p -> new Coordinate(p.longitude, p.latitude))
-        .toArray(Coordinate[]::new);
-
-    LinearRing shell = geometryFactory.createLinearRing(coords);
-    Polygon jtsPolygon = geometryFactory.createPolygon(shell, null);
-
+  public static Polygon offsetPolygonInwards(Polygon jtsPolygon, double offsetValueKm) {
     // Offset inward (negative distance)
     BufferParameters params = new BufferParameters();
     params.setJoinStyle(BufferParameters.JOIN_ROUND); // rounded corners
     Geometry offsetGeom = BufferOp.bufferOp(jtsPolygon, -offsetValueKm / 111.32, params);
-
-    // Convert back to List<PointDTO> (only use the exterior ring)
-    List<PointDTO> offsetPoints = new ArrayList<>();
-    if (offsetGeom instanceof Polygon offsetPolygon) {
-      Coordinate[] offsetCoords = offsetPolygon.getExteriorRing().getCoordinates();
-      for (Coordinate c : offsetCoords) offsetPoints.add(new PointDTO(c.y, c.x));
-    }
-
-    return offsetPoints;
+    return (Polygon) offsetGeom;
   }
 
-  public static boolean isWithinPolygon(List<PointDTO> polygon, double latitude, double longitude) {
-    if (polygon.size() < 3) return false;
-
-    GeometryFactory geometryFactory = new GeometryFactory();
-
-    // Ensure polygon is closed
-    List<PointDTO> closedPolygon = new ArrayList<>(polygon);
-    if (!closedPolygon.get(0).equals(closedPolygon.get(closedPolygon.size() - 1)))
-      closedPolygon.add(closedPolygon.get(0));
-
-    // Convert to JTS Coordinates
-    Coordinate[] coords = closedPolygon.stream()
-        .map(p -> new Coordinate(p.longitude, p.latitude))
-        .toArray(Coordinate[]::new);
-
-    LinearRing shell = geometryFactory.createLinearRing(coords);
-    Polygon jtsPolygon = geometryFactory.createPolygon(shell, null);
-
-    // Create point
-    Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-
+  public static boolean isWithinPolygon(Polygon polygon, double latitude, double longitude) {
     // Check if point is inside polygon (true if inside or on boundary)
-    return jtsPolygon.covers(point);
+    return polygon.covers(new GeometryFactory().createPoint(new Coordinate(longitude, latitude)));
   }
 
 }
