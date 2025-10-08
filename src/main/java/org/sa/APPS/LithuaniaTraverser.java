@@ -15,7 +15,7 @@ import java.util.List;
 public class LithuaniaTraverser {
   private RouteService routeService = new RouteService();
   private GraphHopperService graphHopperService = new GraphHopperService();
-  private OutputService outputService = new OutputService();
+  private GpxOutput outputService = new GpxOutput();
   private RouteImprovingService routeImprovingService = new RouteImprovingService(graphHopperService);
 
   private static final double LITHUANIA_MIN_LAT = 53.88; // y, vertical
@@ -59,7 +59,7 @@ public class LithuaniaTraverser {
 
   private static Polygon getLithuaniaContour() {
     // validate lithuania contour
-    List<PointDTO> lithuaniaContour = InputService.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_super_rough_closed_contour.gpx"));
+    List<PointDTO> lithuaniaContour = GpxParser.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_super_rough_closed_contour.gpx"));
     if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
     List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
     if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))

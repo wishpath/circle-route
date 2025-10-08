@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputService {
+public class GpxParser {
   public static List<PointDTO> parseGpxFile(File gpxFile) {
     List<PointDTO> points = new ArrayList<>();
     try {

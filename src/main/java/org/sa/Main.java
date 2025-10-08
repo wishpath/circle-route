@@ -13,7 +13,7 @@ public class Main {
     new LithuaniaTraverser().traverse();
   }
 
-  private static void generateRoute(RouteService routeService, PointDTO routeCenterPoint, GraphHopperService graphHopperService, RouteImprovingService routeImprovingService, OutputService outputService, int circleCounter) {
+  private static void generateRoute(RouteService routeService, PointDTO routeCenterPoint, GraphHopperService graphHopperService, RouteImprovingService routeImprovingService, GpxOutput outputService, int circleCounter) {
     List<PointDTO> perfectCirclePoints = routeService.generatePerfectCirclePoints(routeCenterPoint, 25, 2);
     //System.out.println("perfect circle points: " + perfectCirclePoints.size());
     List<PointDTO> circlePointsSnappedOnRoad = graphHopperService.snapPointsOnRoadGrid(perfectCirclePoints, Props.GRASSHOPPER_PROFILE1_FOOT_SHORTEST);
