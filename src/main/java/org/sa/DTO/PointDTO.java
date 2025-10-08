@@ -1,4 +1,4 @@
-package org.sa;
+package org.sa.DTO;
 
 public class PointDTO {
   public final double latitude; // y, vertical

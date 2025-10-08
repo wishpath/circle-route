@@ -1,6 +1,6 @@
 package org.sa.service;
 
-import org.sa.PointDTO;
+import org.sa.DTO.PointDTO;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;

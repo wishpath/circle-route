@@ -4,7 +4,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-import org.sa.PointDTO;
+import org.sa.DTO.PointDTO;
 import org.sa.service.*;
 
 import java.io.File;
@@ -64,12 +64,11 @@ public class LithuaniaTraverser {
     List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
     if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))
       lithuaniaContourClosed.add(lithuaniaContourClosed.get(0));
-    // transform format of lithuania contour
-    Coordinate[] coords = lithuaniaContourClosed.stream()
+    Coordinate[] coordinates = lithuaniaContourClosed.stream()
         .map(p -> new Coordinate(p.longitude, p.latitude))
         .toArray(Coordinate[]::new);
     GeometryFactory geometryFactory = new GeometryFactory();
-    LinearRing shell = geometryFactory.createLinearRing(coords);
+    LinearRing shell = geometryFactory.createLinearRing(coordinates);
     Polygon jtsPolygon = geometryFactory.createPolygon(shell, null);
     return jtsPolygon;
   }

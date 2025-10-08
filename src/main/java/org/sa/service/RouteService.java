@@ -1,6 +1,6 @@
 package org.sa.service;
 
-import org.sa.PointDTO;
+import org.sa.DTO.PointDTO;
 
 import java.util.ArrayList;
 import java.util.Collections;

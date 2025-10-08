@@ -1,6 +1,6 @@
 package org.sa.config;
 
-import org.sa.PointDTO;
+import org.sa.DTO.PointDTO;
 import java.util.Map;
 
 public class CityCenters {

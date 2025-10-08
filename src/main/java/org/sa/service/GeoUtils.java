@@ -3,7 +3,7 @@ package org.sa.service;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.buffer.BufferOp;
 import org.locationtech.jts.operation.buffer.BufferParameters;
-import org.sa.PointDTO;
+import org.sa.DTO.PointDTO;
 
 import java.util.ArrayList;
 import java.util.List;

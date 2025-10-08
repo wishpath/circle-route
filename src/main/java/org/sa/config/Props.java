@@ -1,6 +1,6 @@
 package org.sa.config;
 
-import org.sa.PointDTO;
+import org.sa.DTO.PointDTO;
 
 public class Props {
   public static String DATA_NAME = "LT";

@@ -1,6 +1,7 @@
 package org.sa;
 
 import org.sa.APPS.LithuaniaTraverser;
+import org.sa.DTO.PointDTO;
 import org.sa.config.Props;
 import org.sa.service.*;
 
