@@ -13,10 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LithuaniaTraverser {
-  private RouteService routeService = new RouteService();
-  private GraphHopperService graphHopperService = new GraphHopperService();
-  private GpxOutput outputService = new GpxOutput();
-  private RouteImprovingService routeImprovingService = new RouteImprovingService(graphHopperService);
+  private RouteGenerator routeGenerator = new RouteGenerator();
+  private GraphHopper graphHopperService = new GraphHopper();
+  private GpxOutput gpxOutput = new GpxOutput();
 
   private static final double LITHUANIA_MIN_LAT = 53.88; // y, vertical
   private static final double LITHUANIA_MAX_LAT = 56.45; // y, vertical

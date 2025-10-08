@@ -2,7 +2,6 @@ package org.sa.service;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
-import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.Profile;
 import com.graphhopper.util.shapes.GHPoint;
@@ -12,11 +11,11 @@ import org.sa.config.Props;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GraphHopperService {
-  private static GraphHopper hopper;
+public class GraphHopper {
+  private static com.graphhopper.GraphHopper hopper;
 
   static {
-    hopper = new GraphHopper()
+    hopper = new com.graphhopper.GraphHopper()
         .setOSMFile("src/main/java/org/sa/map-data/lithuania-250930.osm.pbf")
         .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
         .setProfiles(

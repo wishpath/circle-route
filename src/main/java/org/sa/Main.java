@@ -13,7 +13,7 @@ public class Main {
     new LithuaniaTraverser().traverse();
   }
 
-  private static void generateRoute(RouteService routeService, PointDTO routeCenterPoint, GraphHopperService graphHopperService, RouteImprovingService routeImprovingService, GpxOutput outputService, int circleCounter) {
+  private static void generateRoute(RouteGenerator routeService, PointDTO routeCenterPoint, GraphHopper graphHopperService, RouteImprovingService routeImprovingService, GpxOutput outputService, int circleCounter) {
     List<PointDTO> perfectCirclePoints = routeService.generatePerfectCirclePoints(routeCenterPoint, 25, 2);
     //System.out.println("perfect circle points: " + perfectCirclePoints.size());
     List<PointDTO> circlePointsSnappedOnRoad = graphHopperService.snapPointsOnRoadGrid(perfectCirclePoints, Props.GRASSHOPPER_PROFILE1_FOOT_SHORTEST);
@@ -41,7 +41,7 @@ public class Main {
     //GPXRouteEfficiencyEvaluator.evaluateGPXRoutesInDirectory(Props.GPX_OUTPUT_DIR);
   }
 
-  private static List<PointDTO> removeLoopsByLoopingTheSameActions(GraphHopperService graphHopperService, RouteService routeService, List<PointDTO> routePoints) {
+  private static List<PointDTO> removeLoopsByLoopingTheSameActions(GraphHopper graphHopperService, RouteGenerator routeService, List<PointDTO> routePoints) {
     double indicatorOfLoop_maxDistance_loopStart_loopFinish_km = 0.2;
     List<PointDTO> noLoops = routeService.removeLoops(routePoints, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
     //System.out.println("1 loops cut: " + noLoops.size());

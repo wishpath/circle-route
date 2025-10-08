@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RouteService {
+public class RouteGenerator {
 
   public List<PointDTO> generatePerfectCirclePoints(PointDTO center, double circleLengthKm, double maxDistanceBetweenPointsKm) {
     double earthRadiusKm = 6371.0;
@@ -84,18 +84,6 @@ public class RouteService {
     result.addAll(firstHalf);
     Collections.reverse(result);
     return result;
-  }
-
-  public PointDTO movePoint(PointDTO point, double northKm, double eastKm) {
-    double earthKmPerDegree = 111.32;
-
-    double latOffset = northKm / earthKmPerDegree;
-    double lonOffset = eastKm / (earthKmPerDegree * Math.cos(Math.toRadians(point.latitude)));
-
-    double newLat = point.latitude + latOffset;
-    double newLon = point.longitude + lonOffset; // east is positive
-
-    return new PointDTO(newLat, newLon);
   }
 }
 
