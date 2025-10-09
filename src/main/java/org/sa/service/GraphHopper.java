@@ -12,17 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GraphHopper {
-  private static com.graphhopper.GraphHopper hopper;
+  private com.graphhopper.GraphHopper hopper;
 
-  static {
+  public GraphHopper(String grasshopperProfileFootShortest) {
     hopper = new com.graphhopper.GraphHopper()
         .setOSMFile("src/main/java/org/sa/map-data/lithuania-250930.osm.pbf")
         .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
         .setProfiles(
-            new Profile(Props.GRASSHOPPER_PROFILE1_FOOT_SHORTEST).setVehicle("foot").setWeighting("shortest"),
-            new Profile(Props.GRASSHOPPER_PROFILE2_BIKE_SHORTEST).setVehicle("bike").setWeighting("shortest"),
-            new Profile("motorbike_shortest").setVehicle("motorcycle").setWeighting("shortest"),
-            new Profile("car_shortest").setVehicle("car").setWeighting("shortest")
+            new Profile(grasshopperProfileFootShortest).setVehicle("foot").setWeighting("shortest")
         )
         .importOrLoad();
   }
@@ -63,7 +60,7 @@ public class GraphHopper {
     // close the loop
     PointDTO first = snappedPoints.get(0);
     PointDTO last = snappedPoints.get(snappedPoints.size() - 1);
-    GHRequest req = new GHRequest(last.latitude, last.longitude, first.latitude, first.longitude).setProfile(Props.GRASSHOPPER_PROFILE1_FOOT_SHORTEST);
+    GHRequest req = new GHRequest(last.latitude, last.longitude, first.latitude, first.longitude).setProfile(grassHopperProfile);
     GHResponse rsp = hopper.route(req);
     if (!rsp.hasErrors()) {
       ResponsePath path = rsp.getBest();

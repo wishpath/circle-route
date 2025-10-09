@@ -12,10 +12,6 @@ public class Props {
   //cache folder name
   public static String CACHE_FOLDER_NAME = Props.DATA_NAME + "-graph-cache"; //don't change since it is defined in gitignore
 
-  //routing preferences
-  public static String GRASSHOPPER_PROFILE1_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
-  public static String GRASSHOPPER_PROFILE2_BIKE_SHORTEST = "bike_shortest"; //delete cache when changed
-
   //output dir
   public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/output-gpx";
 }
