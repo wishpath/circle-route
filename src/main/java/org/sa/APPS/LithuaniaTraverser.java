@@ -45,7 +45,7 @@ public class LithuaniaTraverser {
       for (double latitude = LITHUANIA_MIN_LAT; latitude <= LITHUANIA_MAX_LAT; latitude += LT_GRID_STEP_KM * LAT_STEP_1000_M) {
         for (double longitude = LITHUANIA_MIN_LON; longitude <= LITHUANIA_MAX_LON; longitude += LT_GRID_STEP_KM * LON_STEP_1000_M) {
           totalInstances++; //325 458
-          if (lithuaniaInstances >= 10_000) break outer;
+          if (lithuaniaInstances >= 5_000) break outer;
           if (GeoUtils.isWithinPolygon(ltOffset, latitude, longitude)) {
             lithuaniaInstances++;
             PointDTO center = new PointDTO(latitude, longitude); //+1 s
@@ -55,6 +55,8 @@ public class LithuaniaTraverser {
             //Snapping 332 routes per second
             //Total points: 38843, inside Lithuania: 10000, duration: 30 seconds
             //Snapping 333 routes per second
+            //Total points: 27752, inside Lithuania: 5000, duration: 16 seconds
+            //Snapping 312 routes per second
             List<PointDTO> snappedCircle = graphHopperService.snapPointsOnRoadGrid(perfectCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
 
             //do i need both to snap and route? or this can be done in one?
