@@ -13,10 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LithuaniaTraverser {
-  //routing preferences
+
+  //keeping grass hopper profile here in case it will be needed to rotate them here
   public static String GRASSHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
   private RouteGenerator routeGenerator = new RouteGenerator();
-  private GraphHopper graphHopperService = new GraphHopper(GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+  private GraphHopper graphHopper = new GraphHopper(GRASSHOPPER_PROFILE_FOOT_SHORTEST);
   private GpxOutput gpxOutput = new GpxOutput();
 
   private static final double LITHUANIA_MIN_LAT = 53.88; // y, vertical
@@ -30,7 +31,7 @@ public class LithuaniaTraverser {
   private static final double CIRCLE_LENGTH_MAX = 30.0;
   private static final double CIRCLE_LENGTH_STEP = 5.0;
 
-  private static final int MAX_DISTANCE_BETWEEN_POINTS_KM = 2;
+  private static final int MAX_DISTANCE_BETWEEN_POINTS_KM = 2; // distance between ideal circle points
 
   public void traverse() {
     long totalInstances = 0;
@@ -45,7 +46,7 @@ public class LithuaniaTraverser {
       for (double latitude = LITHUANIA_MIN_LAT; latitude <= LITHUANIA_MAX_LAT; latitude += LT_GRID_STEP_KM * LAT_STEP_1000_M) {
         for (double longitude = LITHUANIA_MIN_LON; longitude <= LITHUANIA_MAX_LON; longitude += LT_GRID_STEP_KM * LON_STEP_1000_M) {
           totalInstances++; //325 458
-          if (lithuaniaInstances >= 5_000) break outer;
+          if (lithuaniaInstances >= 1_000) break outer;
           if (GeoUtils.isWithinPolygon(ltOffset, latitude, longitude)) {
             lithuaniaInstances++;
             PointDTO center = new PointDTO(latitude, longitude); //+1 s
@@ -57,9 +58,29 @@ public class LithuaniaTraverser {
             //Snapping 333 routes per second
             //Total points: 27752, inside Lithuania: 5000, duration: 16 seconds
             //Snapping 312 routes per second
-            List<PointDTO> snappedCircle = graphHopperService.snapPointsOnRoadGrid(perfectCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+            List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
 
+            //Total points: 27752, inside Lithuania: 5000, duration: 38 seconds
+            //Routing 131 routes per second
+            //Total points: 21325, inside Lithuania: 2500, duration: 21 seconds
+            //Routing 119 routes per second
+            List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutes(snappedCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
             //do i need both to snap and route? or this can be done in one?
+
+            //first try: Total points: 21325, inside Lithuania: 2500, duration: 1805 seconds
+            //second try: Total points: 15357, inside Lithuania: 1000, duration: 272 seconds
+            List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle);
+
+
+
+
+
+            //output
+            //outputService.outputGPX(smoothRoutePoints, circleCounter);
+            //outputService.outputGpxWaypoints(smoothRoutePoints);
+
+            //printout efficiency parameters
+            //GPXRouteEfficiencyEvaluator.evaluateGPXRoutesInDirectory(Props.GPX_OUTPUT_DIR);
           }
         }
       }
@@ -72,7 +93,6 @@ public class LithuaniaTraverser {
   }
 
   private static Polygon getLithuaniaContour() {
-    // validate lithuania contour
     List<PointDTO> lithuaniaContour = GpxParser.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_super_rough_closed_contour.gpx"));
     if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
     List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
@@ -87,45 +107,16 @@ public class LithuaniaTraverser {
     return jtsPolygon;
   }
 
-  private static void generateRoute(RouteGenerator routeService, PointDTO routeCenterPoint, GraphHopper graphHopperService, GpxOutput outputService, int circleCounter) {
-    List<PointDTO> perfectCirclePoints = routeService.generatePerfectCirclePoints(routeCenterPoint, 25, 2);
-    List<PointDTO> circlePointsSnappedOnRoad = graphHopperService.snapPointsOnRoadGrid(perfectCirclePoints, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-
-
-    List<PointDTO> routed = graphHopperService.connectSnappedPointsWithRoutes(circlePointsSnappedOnRoad, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-    //System.out.println("routed points: " + routed.size());
-
-    List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(graphHopperService, routeService, routed);
-
-    List<PointDTO> smoothRoutePoints = new ArrayList<>(noLoopRoutedPoints);
-    double maxCheckWindowSize = GeoUtils.autoCloseRouteAndGetLengthKm(noLoopRoutedPoints) / 6;
-    String profile = GRASSHOPPER_PROFILE_FOOT_SHORTEST;
-
-    //output
-    //outputService.outputGPX(smoothRoutePoints, circleCounter);
-    //outputService.outputGpxWaypoints(smoothRoutePoints);
-
-    //printout efficiency parameters
-    //GPXRouteEfficiencyEvaluator.evaluateGPXRoutesInDirectory(Props.GPX_OUTPUT_DIR);
-  }
-
-  private static List<PointDTO> removeLoopsByLoopingTheSameActions(GraphHopper graphHopperService, RouteGenerator routeService, List<PointDTO> routePoints) {
+  private List<PointDTO> removeLoopsByLoopingTheSameActions(List<PointDTO> routePoints) {
     double indicatorOfLoop_maxDistance_loopStart_loopFinish_km = 0.2;
-    List<PointDTO> noLoops = routeService.removeLoops(routePoints, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
-    //System.out.println("1 loops cut: " + noLoops.size());
-    List<PointDTO> noLoopsRouted = graphHopperService.connectSnappedPointsWithRoutes(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST); //reroute to fix loop cuts
-    //System.out.println("1 rerout: " + noLoopsRouted.size());
-    List<PointDTO> shifted = routeService.shiftABtoBA_andReverse(noLoopsRouted);
-    //System.out.println("1 shifted: " + shifted.size());
+    List<PointDTO> noLoops;
+    List<PointDTO> noLoopsRouted;
+    List<PointDTO> shifted = routePoints;
 
-    for (int i = 2; i < 8; i++, indicatorOfLoop_maxDistance_loopStart_loopFinish_km /= 2) {
-      //System.out.println();
-      noLoops = routeService.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
-      //System.out.println(i + " loops cut: " + noLoops.size());
-      noLoopsRouted = graphHopperService.connectSnappedPointsWithRoutes(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-      //System.out.println(i + " rerout: " + noLoopsRouted.size());
-      shifted = routeService.shiftABtoBA_andReverse(noLoopsRouted);
-      //System.out.println(i + " shifted: " + shifted.size());
+    for (int i = 0; i < 3; i++) {
+      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
+      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutes(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+      shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
     }
     return shifted;
   }
