@@ -58,7 +58,7 @@ public class GraphHopper {
   }
 
 
-  public List<PointDTO> connectSnappedPointsWithRoutes(List<PointDTO> snappedPoints, String grassHopperProfile) {
+  public List<PointDTO> connectSnappedPointsWithRoutesAndClose(List<PointDTO> snappedPoints, String grassHopperProfile) {
     List<PointDTO> routedPoints = new ArrayList<>();
     for (int i = 0; i < snappedPoints.size() - 1; i++) {
       PointDTO from = snappedPoints.get(i);
@@ -84,6 +84,27 @@ public class GraphHopper {
     if (!rsp.hasErrors()) {
       ResponsePath path = rsp.getBest();
       path.getPoints().forEach(p -> routedPoints.add(new PointDTO(p.lat, p.lon)));
+    }
+
+    return routedPoints;
+  }
+
+  public List<PointDTO> connectSnappedPointsWithRoutesNoClosing(List<PointDTO> snappedPoints, String grassHopperProfile) {
+    List<PointDTO> routedPoints = new ArrayList<>();
+    for (int i = 0; i < snappedPoints.size() - 1; i++) {
+      PointDTO from = snappedPoints.get(i);
+      PointDTO to = snappedPoints.get(i + 1);
+
+      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile(grassHopperProfile);
+      GHResponse rsp = hopper.route(req);
+
+      if (!rsp.hasErrors()) {
+        ResponsePath path = rsp.getBest();
+        path.getPoints().forEach(p -> routedPoints.add(new PointDTO(p.lat, p.lon)));
+      } else {
+        routedPoints.add(from);
+        routedPoints.add(to);
+      }
     }
 
     return routedPoints;

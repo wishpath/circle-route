@@ -117,5 +117,23 @@ public class GeoUtils {
     return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
+  public static List<PointDTO> addExtraPointsInBetweenExistingOnes(List<PointDTO> routePoints) {
+    List<PointDTO> enhancedRoute = new ArrayList<>();
+    if (routePoints.size() < 2) return new ArrayList<>(routePoints);
+
+    int n = routePoints.size();
+    for (int i = 0; i < n; i++) {
+      PointDTO current = routePoints.get(i);
+      PointDTO next = routePoints.get((i + 1) % n); // wrap around for last → first
+      enhancedRoute.add(current);
+
+      // calculate midpoint
+      double midLat = (current.latitude + next.latitude) / 2;
+      double midLon = (current.longitude + next.longitude) / 2;
+
+      enhancedRoute.add(new PointDTO(midLat, midLon));
+    }
+    return enhancedRoute;
+  }
 }
 

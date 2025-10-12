@@ -1,4 +1,5 @@
 problems:
+  - for (; loopStartPoint < routedPoints.size(); loopStartPoint++) { //for efficiency move by some distance, like at least 50 meters
   - //do i need both to snap and route? or this can be done in one?
   - improve traversing lithuania speed: isWithinPolygon is processing the same thing over and over currently
   - double idealAreaKm = round2(GeoUtils.getCircleAreaByLength(routeLength)); // precalculate this and store to a map

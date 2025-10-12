@@ -2,12 +2,10 @@ package org.sa.APPS;
 
 import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
-import org.sa.service.EfficiencyService;
-import org.sa.service.GpxOutput;
-import org.sa.service.GraphHopper;
-import org.sa.service.RouteGenerator;
+import org.sa.service.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -81,56 +79,56 @@ public class CitiesTraverser {
 
 
   public static final Map<String, PointDTO> city_townCenter = Map.ofEntries(
-//      Map.entry("vilnius", VILNIUS_CENTER),
-//      Map.entry("kaunas", KAUNAS_CENTER),
-//      Map.entry("klaipeda", KLAIPEDA_CENTER),
-//      Map.entry("siauliai", SIAULIAI_CENTER),
-//      Map.entry("panevezys", PANEVEZYS_CENTER),
-//      Map.entry("alytus", ALYTUS_CENTER),
-//      Map.entry("marijampole", MARIJAMPOLE_CENTER),
-//      Map.entry("mazeikiai", MAZEIKIAI_CENTER),
-//      Map.entry("utena", UTENA_CENTER),
-//      Map.entry("jonava", JONAVA_CENTER),
-//      Map.entry("kedainiai", KEDAINIAI_CENTER),
-//      Map.entry("telsiai", TELSIAI_CENTER),
-//      Map.entry("taurage", TAURAGE_CENTER),
-//      Map.entry("ukmerge", UKMERGE_CENTER),
-//      Map.entry("visaginas", VISAGINAS_CENTER),
-      Map.entry("palanga", PALANGA_CENTER)//,
-//      Map.entry("plunge", PLUNGE_CENTER),
-//      Map.entry("kretinga", KRETINGA_CENTER),
-//      Map.entry("silute", SILUTE_CENTER),
-//      Map.entry("rokiskis", ROKISKIS_CENTER),
-//      Map.entry("kursenai", KURSENAI_CENTER),
-//      Map.entry("birzai", BIRZAI_CENTER),
-//      Map.entry("raseiniai", RASEINIAI_CENTER),
-//      Map.entry("jurbarkas", JURBARKAS_CENTER),
-//      Map.entry("elektrenai", ELEKTRENAI_CENTER),
-//      Map.entry("anyksciai", ANYKSCIAI_CENTER),
-//      Map.entry("druskininkai", DRUSKININKAI_CENTER),
-//      Map.entry("vilkaviskis", VILKAVISKIS_CENTER),
-//      Map.entry("zarasai", ZARASAI_CENTER),
-//      Map.entry("ignalina", IGNALINA_CENTER),
-//      Map.entry("moletai", MOLETAI_CENTER),
-//      Map.entry("svencioneliai", SVENCIONELIAI_CENTER),
-//      Map.entry("pabrade", PABRADE_CENTER),
-//      Map.entry("sirvintos", SIRVINTOS_CENTER),
-//      Map.entry("nemencine", NEMENCINE_CENTER),
-//      Map.entry("kupiskis", KUPISKIS_CENTER),
-//      Map.entry("vabalninkas", VABALNINKAS_CENTER),
-//      Map.entry("pakruojis", PAKRUOJIS_CENTER),
-//      Map.entry("krekenava", KREKENAVA_CENTER),
-//      Map.entry("varena", VARENA_CENTER),
-//      Map.entry("sakiai", SAKIAI_CENTER),
-//      Map.entry("gargzdai", GARGZDAI_CENTER),
-//      Map.entry("salantai", SALANTAI_CENTER),
-//      Map.entry("skuodas", SKUODAS_CENTER),
-//      Map.entry("vilkija", VILKIJA_CENTER),
-//      Map.entry("ariogala", ARIOGALA_CENTER),
-//      Map.entry("kaisiadorys", KAISIADORYS_CENTER),
-//      Map.entry("prienai", PRIENAI_CENTER),
-//      Map.entry("kazlu_ruda", KAZLU_RUDA_CENTER),
-//      Map.entry("joniskis", JONISKIS_CENTER)
+      Map.entry("vilnius", VILNIUS_CENTER),
+      Map.entry("kaunas", KAUNAS_CENTER),
+      Map.entry("klaipeda", KLAIPEDA_CENTER),
+      Map.entry("siauliai", SIAULIAI_CENTER),
+      Map.entry("panevezys", PANEVEZYS_CENTER),
+      Map.entry("alytus", ALYTUS_CENTER),
+      Map.entry("marijampole", MARIJAMPOLE_CENTER),
+      Map.entry("mazeikiai", MAZEIKIAI_CENTER),
+      Map.entry("utena", UTENA_CENTER),
+      Map.entry("jonava", JONAVA_CENTER),
+      Map.entry("kedainiai", KEDAINIAI_CENTER),
+      Map.entry("telsiai", TELSIAI_CENTER),
+      Map.entry("taurage", TAURAGE_CENTER),
+      Map.entry("ukmerge", UKMERGE_CENTER),
+      Map.entry("visaginas", VISAGINAS_CENTER),
+      Map.entry("palanga", PALANGA_CENTER),
+      Map.entry("plunge", PLUNGE_CENTER),
+      Map.entry("kretinga", KRETINGA_CENTER),
+      Map.entry("silute", SILUTE_CENTER),
+      Map.entry("rokiskis", ROKISKIS_CENTER),
+      Map.entry("kursenai", KURSENAI_CENTER),
+      Map.entry("birzai", BIRZAI_CENTER),
+      Map.entry("raseiniai", RASEINIAI_CENTER),
+      Map.entry("jurbarkas", JURBARKAS_CENTER),
+      Map.entry("elektrenai", ELEKTRENAI_CENTER),
+      Map.entry("anyksciai", ANYKSCIAI_CENTER),
+      Map.entry("druskininkai", DRUSKININKAI_CENTER),
+      Map.entry("vilkaviskis", VILKAVISKIS_CENTER),
+      Map.entry("zarasai", ZARASAI_CENTER),
+      Map.entry("ignalina", IGNALINA_CENTER),
+      Map.entry("moletai", MOLETAI_CENTER),
+      Map.entry("svencioneliai", SVENCIONELIAI_CENTER),
+      Map.entry("pabrade", PABRADE_CENTER),
+      Map.entry("sirvintos", SIRVINTOS_CENTER),
+      Map.entry("nemencine", NEMENCINE_CENTER),
+      Map.entry("kupiskis", KUPISKIS_CENTER),
+      Map.entry("vabalninkas", VABALNINKAS_CENTER),
+      Map.entry("pakruojis", PAKRUOJIS_CENTER),
+      Map.entry("krekenava", KREKENAVA_CENTER),
+      Map.entry("varena", VARENA_CENTER),
+      Map.entry("sakiai", SAKIAI_CENTER),
+      Map.entry("gargzdai", GARGZDAI_CENTER),
+      Map.entry("salantai", SALANTAI_CENTER),
+      Map.entry("skuodas", SKUODAS_CENTER),
+      Map.entry("vilkija", VILKIJA_CENTER),
+      Map.entry("ariogala", ARIOGALA_CENTER),
+      Map.entry("kaisiadorys", KAISIADORYS_CENTER),
+      Map.entry("prienai", PRIENAI_CENTER),
+      Map.entry("kazlu_ruda", KAZLU_RUDA_CENTER),
+      Map.entry("joniskis", JONISKIS_CENTER)
   );
 
   public void traverse() {
@@ -138,6 +136,7 @@ public class CitiesTraverser {
 
     //Total instances: 150, duration: 31 seconds,  instances per second: 4
     //Total instances: 150, duration: 60 seconds, instances per second: 2
+    //Total instances: 150, duration: 63 seconds, instances per second: 2
     outer:
     for (double perimeter = CIRCLE_LENGTH_MIN; perimeter <= CIRCLE_LENGTH_MAX; perimeter += CIRCLE_LENGTH_STEP) {
       final double finalPerimeter = perimeter;
@@ -145,12 +144,11 @@ public class CitiesTraverser {
       city_townCenter.forEach((townName, center) -> {
         List<PointDTO> perfectCircle = routeGenerator.generatePerfectCirclePoints(center, finalPerimeter, MAX_DISTANCE_BETWEEN_POINTS_KM); // +0s
         List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+        List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+        List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
 
-        //List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutes(snappedCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-        //List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
-
-        EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(snappedCircle);
-        gpxOutput.outputGPX(snappedCircle, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName);
+        EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(noLoopRoutedPoints);
+        gpxOutput.outputGPX(noLoopRoutedPoints, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName);
       });
     }
 
@@ -166,15 +164,17 @@ public class CitiesTraverser {
 
   //doubled method, care!
   private List<PointDTO> removeLoopsByLoopingTheSameActions(List<PointDTO> routePoints) {
-    double indicatorOfLoop_maxDistance_loopStart_loopFinish_km = 0.2;
-    List<PointDTO> noLoops;
+    double indicatorOfLoop = 0.3;
+    List<PointDTO> noLoops = new ArrayList<>();
     List<PointDTO> noLoopsRouted;
-    List<PointDTO> shifted = routePoints;
+    List<PointDTO> shifted = GeoUtils.addExtraPointsInBetweenExistingOnes(routePoints);
 
-    for (int i = 0; i < 4; i++) {
-      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
-      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutes(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+
+    for (int i = 0; i < 2; i++) {
+      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop, graphHopper, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
       shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
+      shifted.add(shifted.get(0));
     }
     return shifted;
   }

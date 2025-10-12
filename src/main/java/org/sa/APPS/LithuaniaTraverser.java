@@ -4,6 +4,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
+import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
 import org.sa.service.*;
 
@@ -19,6 +20,7 @@ public class LithuaniaTraverser {
   private RouteGenerator routeGenerator = new RouteGenerator();
   private GraphHopper graphHopper = new GraphHopper(GRASSHOPPER_PROFILE_FOOT_SHORTEST);
   private GpxOutput gpxOutput = new GpxOutput();
+  private EfficiencyService efficiencyService = new EfficiencyService();
 
   private static final double LITHUANIA_MIN_LAT = 53.88; // y, vertical
   private static final double LITHUANIA_MAX_LAT = 56.45; // y, vertical
@@ -27,7 +29,7 @@ public class LithuaniaTraverser {
   private static final double LAT_STEP_1000_M = 1000.0 / 111_320.0; // ≈ 0.00898 degrees ≈ 1 km
   private static final double LON_STEP_1000_M = 1000.0 / (111_320.0 * Math.cos(Math.toRadians(55.0))); // ≈ 0.0156 degrees ≈ 1 km at ~55°N private static final double STEP_KOEF = 10.0;
   private static final double LT_GRID_STEP_KM = 1.0;
-  private static final double CIRCLE_LENGTH_MIN = 20.0;
+  private static final double CIRCLE_LENGTH_MIN = 30.0;
   private static final double CIRCLE_LENGTH_MAX = 30.0;
   private static final double CIRCLE_LENGTH_STEP = 5.0;
 
@@ -36,6 +38,8 @@ public class LithuaniaTraverser {
   public void traverse() {
     long totalInstances = 0;
     long lithuaniaInstances = 0;
+    long okInstances = 0;
+    int maxEfficiency = -1;
 
     Polygon lithuaniaContour = getLithuaniaContour();
     LocalDateTime start = LocalDateTime.now();
@@ -46,9 +50,13 @@ public class LithuaniaTraverser {
       for (double latitude = LITHUANIA_MIN_LAT; latitude <= LITHUANIA_MAX_LAT; latitude += LT_GRID_STEP_KM * LAT_STEP_1000_M) {
         for (double longitude = LITHUANIA_MIN_LON; longitude <= LITHUANIA_MAX_LON; longitude += LT_GRID_STEP_KM * LON_STEP_1000_M) {
           totalInstances++; //325 458
-          if (lithuaniaInstances >= 1_000) break outer;
+          //if (lithuaniaInstances >= 1_000) break outer;
           if (GeoUtils.isWithinPolygon(ltOffset, latitude, longitude)) {
             lithuaniaInstances++;
+
+
+
+            //Total points: 108486, inside Lithuania: 47456, duration: 7 seconds
             PointDTO center = new PointDTO(latitude, longitude); //+1 s
             List<PointDTO> perfectCircle = routeGenerator.generatePerfectCirclePoints(center, perimeter, MAX_DISTANCE_BETWEEN_POINTS_KM); // +0s
 
@@ -64,12 +72,26 @@ public class LithuaniaTraverser {
             //Routing 131 routes per second
             //Total points: 21325, inside Lithuania: 2500, duration: 21 seconds
             //Routing 119 routes per second
-            List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutes(snappedCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+            List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
             //do i need both to snap and route? or this can be done in one?
 
             //first try: Total points: 21325, inside Lithuania: 2500, duration: 1805 seconds
             //second try: Total points: 15357, inside Lithuania: 1000, duration: 272 seconds
             List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle);
+
+            EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(noLoopRoutedPoints);
+            //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 24
+            //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 5
+            //Total points: 13409, inside Lithuania: 300, duration: 91 seconds, OK routes: 4
+            //Total points: 17588, inside Lithuania: 1000, duration: 327 seconds, OK routes: 7 , max efficiency: 70
+            if (efficiencyDTO.efficiencyPercent > 69) {
+              okInstances++;
+              maxEfficiency = Math.max(maxEfficiency, efficiencyDTO.efficiencyPercent);
+
+              //Total points: 17588, inside Lithuania: 1000, duration: 402 seconds, OK routes: 7 , max efficiency: 70
+              gpxOutput.outputGPX(noLoopRoutedPoints, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_");
+            }
+            if (lithuaniaInstances % 500 == 0) System.out.println(((lithuaniaInstances * 100) / 47456) + "%");
           }
         }
       }
@@ -78,7 +100,10 @@ public class LithuaniaTraverser {
     System.out.println(
         "Total points: " + totalInstances +
         ", inside Lithuania: " + lithuaniaInstances +
-        ", duration: " + (int) java.time.Duration.between(start, LocalDateTime.now()).toSeconds() + " seconds");
+        ", duration: " + (int) java.time.Duration.between(start, LocalDateTime.now()).toSeconds() + " seconds, " +
+        "OK routes: " + okInstances + " , " +
+        "max efficiency: " + maxEfficiency);
+
   }
 
   private static Polygon getLithuaniaContour() {
@@ -102,11 +127,29 @@ public class LithuaniaTraverser {
     List<PointDTO> noLoopsRouted;
     List<PointDTO> shifted = routePoints;
 
-    for (int i = 0; i < 3; i++) {
-      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km);
-      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutes(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+    for (int i = 0; i < 2; i++) {
+      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km, graphHopper, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
       shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
+      shifted.add(shifted.get(0));
     }
     return shifted;
   }
+
+//  //doubled method, care!
+//  private List<PointDTO> removeLoopsByLoopingTheSameActions(List<PointDTO> routePoints) {
+//    double indicatorOfLoop = 0.3;
+//    List<PointDTO> noLoops = new ArrayList<>();
+//    List<PointDTO> noLoopsRouted;
+//    List<PointDTO> shifted = GeoUtils.addExtraPointsInBetweenExistingOnes(routePoints);
+//
+//
+//    for (int i = 0; i < 2; i++) {
+//      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop, graphHopper, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+//      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+//      shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
+//      shifted.add(shifted.get(0));
+//    }
+//    return shifted;
+//  }
 }
