@@ -7,7 +7,7 @@ import java.util.List;
 
 
 public class EfficiencyService {
-  public EfficiencyDTO getRouteEfficiency(String routeName, List<PointDTO> routePoints) {
+  public EfficiencyDTO getRouteEfficiency(List<PointDTO> routePoints) {
     double routeLength = round2(GeoUtils.autoCloseRouteAndGetLengthKm(routePoints));
     double routeAreaKm = round2(GeoUtils.getRouteAreaKm(routePoints));
     double routeAreaPerKm = round2(routeAreaKm / routeLength);
@@ -16,7 +16,7 @@ public class EfficiencyService {
     return new EfficiencyDTO(routeLength, routeAreaKm, routeAreaPerKm, efficiencyPercent);
   }
 
-  public static void printRouteEfficiency(EfficiencyDTO efficiencyDTO, String routeName) {
+  public void printRouteEfficiency(EfficiencyDTO efficiencyDTO, String routeName) {
     final String BLUE = "\u001B[34m";
     final String RED = "\u001B[31m";
     final String RESET = "\u001B[0m";

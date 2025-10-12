@@ -38,7 +38,7 @@ public class GpxFilesInDirectoryEvaluatorApp {
       //close route
       if (!routePoints.get(0).equals(routePoints.get(routePoints.size() - 1))) routePoints.add(routePoints.get(0));
 
-      EfficiencyDTO efficiency = efficiencyService.getRouteEfficiency(gpxFile.getName(), routePoints);
+      EfficiencyDTO efficiency = efficiencyService.getRouteEfficiency(routePoints);
       efficiencyService.printRouteEfficiency(efficiency, gpxFile.getName());
     }
   }

@@ -70,17 +70,6 @@ public class LithuaniaTraverser {
             //first try: Total points: 21325, inside Lithuania: 2500, duration: 1805 seconds
             //second try: Total points: 15357, inside Lithuania: 1000, duration: 272 seconds
             List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle);
-
-
-
-
-
-            //output
-            //outputService.outputGPX(smoothRoutePoints, circleCounter);
-            //outputService.outputGpxWaypoints(smoothRoutePoints);
-
-            //printout efficiency parameters
-            //GPXRouteEfficiencyEvaluator.evaluateGPXRoutesInDirectory(Props.GPX_OUTPUT_DIR);
           }
         }
       }

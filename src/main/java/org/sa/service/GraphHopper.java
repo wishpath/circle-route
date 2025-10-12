@@ -4,7 +4,10 @@ import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.Profile;
-import com.graphhopper.util.shapes.GHPoint;
+import com.graphhopper.routing.util.EdgeFilter;
+import com.graphhopper.storage.Graph;
+import com.graphhopper.storage.NodeAccess;
+import com.graphhopper.storage.index.Snap;
 import org.sa.DTO.PointDTO;
 import org.sa.config.Props;
 
@@ -12,14 +15,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GraphHopper {
-  private com.graphhopper.GraphHopper hopper;
+  public com.graphhopper.GraphHopper hopper;
 
   public GraphHopper(String grasshopperProfileFootShortest) {
     hopper = new com.graphhopper.GraphHopper()
         .setOSMFile("src/main/java/org/sa/map-data/lithuania-250930.osm.pbf")
         .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
         .setProfiles(
-            new Profile(grasshopperProfileFootShortest).setVehicle("foot").setWeighting("shortest")
+            new Profile(grasshopperProfileFootShortest)
+                .setVehicle("foot")
+                .setWeighting("shortest")
         )
         .importOrLoad();
   }
@@ -27,17 +32,31 @@ public class GraphHopper {
   public List<PointDTO> snapPointsOnRoadGrid(List<PointDTO> perfectCircle, String grassHopperProfile) {
     List<PointDTO> snapped = new ArrayList<>();
     for (PointDTO p : perfectCircle) {
-      GHRequest req = new GHRequest(p.latitude, p.longitude, p.latitude, p.longitude).setProfile(grassHopperProfile);
-      GHResponse rsp = hopper.route(req);
+      Snap snap = hopper.getLocationIndex().findClosest(p.latitude, p.longitude, EdgeFilter.ALL_EDGES);
+      if (snap.isValid()) snapped.add(new PointDTO(snap.getSnappedPoint().lat, snap.getSnappedPoint().lon));
+      else {
+        Graph graph = hopper.getBaseGraph();
+        NodeAccess nodeAccess = graph.getNodeAccess();
+        int nodes = graph.getNodes();
+        double bestDist = Double.MAX_VALUE;
+        double bestLat = p.latitude, bestLon = p.longitude;
 
-      if (!rsp.hasErrors()) {
-        ResponsePath path = rsp.getBest();
-        GHPoint snappedPoint = path.getPoints().get(0);
-        snapped.add(new PointDTO(snappedPoint.lat, snappedPoint.lon));
-      } else snapped.add(p);
+        for (int i = 0; i < nodes; i++) {
+          double lat = nodeAccess.getLat(i), lon = nodeAccess.getLon(i);
+          double dist = GeoUtils.haversine(p.latitude, p.longitude, lat, lon);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestLat = lat; bestLon = lon;
+          }
+        }
+
+        // only snap if within 50 km (50000 m)
+        if (bestDist <= 50000) snapped.add(new PointDTO(bestLat, bestLon));
+      }
     }
     return snapped;
   }
+
 
   public List<PointDTO> connectSnappedPointsWithRoutes(List<PointDTO> snappedPoints, String grassHopperProfile) {
     List<PointDTO> routedPoints = new ArrayList<>();
