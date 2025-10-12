@@ -89,7 +89,9 @@ public class LithuaniaTraverser {
               maxEfficiency = Math.max(maxEfficiency, efficiencyDTO.efficiencyPercent);
 
               //Total points: 17588, inside Lithuania: 1000, duration: 402 seconds, OK routes: 7 , max efficiency: 70
-              gpxOutput.outputGPX(noLoopRoutedPoints, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_");
+              //Total points: 108486, inside Lithuania: 47456, duration: 13455 seconds, OK routes: 70 , max efficiency: 80
+
+              gpxOutput.outputGPX(noLoopRoutedPoints, efficiencyDTO.efficiencyPercent + "eff_"+ (int) efficiencyDTO.routeLength + "km_" + (int)efficiencyDTO.routeAreaKm + "sqkm");
             }
             if (lithuaniaInstances % 500 == 0) System.out.println(((lithuaniaInstances * 100) / 47456) + "%");
           }
