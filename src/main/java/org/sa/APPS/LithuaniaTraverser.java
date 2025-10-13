@@ -84,7 +84,7 @@ public class LithuaniaTraverser {
             //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 5
             //Total points: 13409, inside Lithuania: 300, duration: 91 seconds, OK routes: 4
             //Total points: 17588, inside Lithuania: 1000, duration: 327 seconds, OK routes: 7 , max efficiency: 70
-            if (eff.efficiencyPercent > 69) {
+            if (eff.efficiencyPercent > 71) {
               okInstances++;
               maxEfficiency = Math.max(maxEfficiency, eff.efficiencyPercent);
 

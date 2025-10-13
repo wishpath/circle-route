@@ -3,6 +3,7 @@ package org.sa.APPS;
 import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
 import org.sa.service.EfficiencyService;
+import org.sa.service.GpxOutput;
 import org.sa.service.GpxParser;
 
 import java.io.File;
@@ -40,10 +41,10 @@ public class GpxFilesInDirectoryEvaluatorApp {
 
       EfficiencyDTO eff = efficiencyService.getRouteEfficiency(routePoints);
       efficiencyService.printRouteEfficiency(eff, gpxFile.getName());
-//      new GpxOutput().outputGPXToDir(
-//          routePoints,
-//          eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + gpxFile.getName().split("_")[2] + "_" + (int)eff.routeAreaKm + "sqkm_" + counter++,
-//          "src/main/java/org/sa/APPS/renamed");
+      new GpxOutput().outputGPXToDir(
+          routePoints,
+          eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + gpxFile.getName() + "_" + (int)eff.routeAreaKm + "sqkm_" + counter++,
+          "src/main/java/org/sa/APPS/renamed");
     }
   }
 }
