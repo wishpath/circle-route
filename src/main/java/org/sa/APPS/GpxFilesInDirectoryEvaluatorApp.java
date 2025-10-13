@@ -31,15 +31,19 @@ public class GpxFilesInDirectoryEvaluatorApp {
       System.err.println("No GPX files found in folder: " + path);
       return;
     }
-
+    int counter = 1;
     for (File gpxFile : gpxFiles) {
       List<PointDTO> routePoints = GpxParser.parseGpxFile(gpxFile);
       if (routePoints.size() < 2) continue;
       //close route
       if (!routePoints.get(0).equals(routePoints.get(routePoints.size() - 1))) routePoints.add(routePoints.get(0));
 
-      EfficiencyDTO efficiency = efficiencyService.getRouteEfficiency(routePoints);
-      efficiencyService.printRouteEfficiency(efficiency, gpxFile.getName());
+      EfficiencyDTO eff = efficiencyService.getRouteEfficiency(routePoints);
+      efficiencyService.printRouteEfficiency(eff, gpxFile.getName());
+//      new GpxOutput().outputGPXToDir(
+//          routePoints,
+//          eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + gpxFile.getName().split("_")[2] + "_" + (int)eff.routeAreaKm + "sqkm_" + counter++,
+//          "src/main/java/org/sa/APPS/renamed");
     }
   }
 }

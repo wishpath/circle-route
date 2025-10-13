@@ -9,9 +9,14 @@ import java.io.IOException;
 import java.util.List;
 
 public class GpxOutput {
+
   public void outputGPX(List<PointDTO> circlePointsSnappedOnRoad, String circleFileName) { //overwrites
+    outputGPXToDir(circlePointsSnappedOnRoad, circleFileName, Props.GPX_OUTPUT_DIR);
+  }
+
+  public void outputGPXToDir(List<PointDTO> circlePointsSnappedOnRoad, String circleFileName, String outputDir) { //overwrites
     try {
-      File dir = new File(Props.GPX_OUTPUT_DIR);
+      File dir = new File(outputDir);
       if (!dir.exists()) dir.mkdirs();
 
       File gpxFile = new File(dir, circleFileName + ".gpx");
