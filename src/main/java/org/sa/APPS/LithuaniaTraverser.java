@@ -11,6 +11,7 @@ import org.sa.service.*;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class LithuaniaTraverser {
@@ -29,9 +30,9 @@ public class LithuaniaTraverser {
   private static final double LAT_STEP_1000_M = 1000.0 / 111_320.0; // ≈ 0.00898 degrees ≈ 1 km
   private static final double LON_STEP_1000_M = 1000.0 / (111_320.0 * Math.cos(Math.toRadians(55.0))); // ≈ 0.0156 degrees ≈ 1 km at ~55°N private static final double STEP_KOEF = 10.0;
   private static final double LT_GRID_STEP_KM = 1.0;
-  private static final double CIRCLE_LENGTH_MIN = 35.0;
-  private static final double CIRCLE_LENGTH_MAX = 35.0;
-  private static final double CIRCLE_LENGTH_STEP = 5.0;
+  private static final double CIRCLE_LENGTH_MIN = 25.0;
+  private static final double CIRCLE_LENGTH_MAX = 40.0;
+  private static final double CIRCLE_LENGTH_STEP = 15.0;
 
   private static final int MAX_DISTANCE_BETWEEN_POINTS_KM = 2; // distance between ideal circle points
 
@@ -84,16 +85,23 @@ public class LithuaniaTraverser {
             //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 5
             //Total points: 13409, inside Lithuania: 300, duration: 91 seconds, OK routes: 4
             //Total points: 17588, inside Lithuania: 1000, duration: 327 seconds, OK routes: 7 , max efficiency: 70
-            if (eff.efficiencyPercent > 71) {
+            if (eff.efficiencyPercent > 73) {
               okInstances++;
               maxEfficiency = Math.max(maxEfficiency, eff.efficiencyPercent);
 
               //Total points: 17588, inside Lithuania: 1000, duration: 402 seconds, OK routes: 7 , max efficiency: 70
               //Total points: 108486, inside Lithuania: 47456, duration: 13455 seconds, OK routes: 70 , max efficiency: 80
 
+              String city = CitiesTraverser.city_townCenter.entrySet().stream()
+                  .min(Comparator.comparingDouble(e -> GeoUtils.getDistanceBetweenLocations(e.getValue(), noLoopRoutedPoints.get(0))))
+                  .map(java.util.Map.Entry::getKey)
+                  .orElse("Unknown");
+
               gpxOutput.outputGPX(
                   noLoopRoutedPoints,
-                  eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + "_" + (int)eff.routeAreaKm + "sqkm_" + okInstances);
+                  //eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + "_" + (int)eff.routeAreaKm + "sqkm_" + okInstances
+                  city
+              );
             }
             if (lithuaniaInstances % 500 == 0) System.out.println(((lithuaniaInstances * 100) / 47456) + "%");
           }
