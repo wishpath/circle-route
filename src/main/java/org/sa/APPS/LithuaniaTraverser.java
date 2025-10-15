@@ -30,7 +30,7 @@ public class LithuaniaTraverser {
   private static final double LAT_STEP_1000_M = 1000.0 / 111_320.0; // ≈ 0.00898 degrees ≈ 1 km
   private static final double LON_STEP_1000_M = 1000.0 / (111_320.0 * Math.cos(Math.toRadians(55.0))); // ≈ 0.0156 degrees ≈ 1 km at ~55°N private static final double STEP_KOEF = 10.0;
   private static final double LT_GRID_STEP_KM = 1.0;
-  private static final double CIRCLE_LENGTH_MIN = 15.0;
+  private static final double CIRCLE_LENGTH_MIN = 20.0;
   private static final double CIRCLE_LENGTH_MAX = 20.0;
   private static final double CIRCLE_LENGTH_STEP = 5.0;
 
@@ -85,7 +85,7 @@ public class LithuaniaTraverser {
             //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 5
             //Total points: 13409, inside Lithuania: 300, duration: 91 seconds, OK routes: 4
             //Total points: 17588, inside Lithuania: 1000, duration: 327 seconds, OK routes: 7 , max efficiency: 70
-            if (eff.efficiencyPercent > 73) {
+            if (eff.efficiencyPercent > 77) {
               okInstances++;
               maxEfficiency = Math.max(maxEfficiency, eff.efficiencyPercent);
 
@@ -96,6 +96,8 @@ public class LithuaniaTraverser {
                   .min(Comparator.comparingDouble(e -> GeoUtils.getDistanceBetweenLocations(e.getValue(), noLoopRoutedPoints.get(0))))
                   .map(java.util.Map.Entry::getKey)
                   .orElse("Unknown");
+
+              System.out.println(city + " " +  eff);
 
               gpxOutput.outputGPX(
                   noLoopRoutedPoints,
@@ -115,7 +117,6 @@ public class LithuaniaTraverser {
         ", duration: " + (int) java.time.Duration.between(start, LocalDateTime.now()).toSeconds() + " seconds, " +
         "OK routes: " + okInstances + " , " +
         "max efficiency: " + maxEfficiency);
-
   }
 
   private static Polygon getLithuaniaContour() {
