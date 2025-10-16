@@ -1,4 +1,5 @@
 problems:
+  - add more town centers so finding closest city would be more precise
   - why no routes with intended length of 40km?
   - for (; loopStartPoint < routedPoints.size(); loopStartPoint++) { //for efficiency move by some distance, like at least 50 meters
   - //do i need both to snap and route? or this can be done in one?
