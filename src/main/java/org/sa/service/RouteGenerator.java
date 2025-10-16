@@ -25,7 +25,7 @@ public class RouteGenerator {
     return points;
   }
 
-  public List<PointDTO> removeLoops(List<PointDTO> initialRoute, double indicatorOfLoop, GraphHopper graphHopper, String grasshopperProfileFootShortest) {
+  public List<PointDTO> removeLoops(List<PointDTO> initialRoute, double indicatorOfLoop, GraphHopper graphHopper, String graphHopperProfileFootShortest) {
     List<PointDTO> cleanedFromLoops = new ArrayList<>();
     if (initialRoute.isEmpty()) return cleanedFromLoops;
     double loopSizeThreshold = GeoUtils.autoCloseRouteAndGetLengthKm(initialRoute) * 0.3; // loop cannot be bigger than a third of course.
@@ -62,11 +62,11 @@ public class RouteGenerator {
           }
 
           //simply reroute this loop that covers start and endpoint
-          List<PointDTO> rerouted = graphHopper.connectSnappedPointsWithRoutesNoClosing(List.of(initialRoute.get(loopStartPoint), initialRoute.get(newStartingIndexOfCleanRoute)), grasshopperProfileFootShortest);
+          List<PointDTO> rerouted = graphHopper.connectSnappedPointsWithRoutesNoClosing(List.of(initialRoute.get(loopStartPoint), initialRoute.get(newStartingIndexOfCleanRoute)), graphHopperProfileFootShortest);
           cleanedFromLoops.addAll(rerouted);
           return cleanedFromLoops.subList(newStartingIndexOfCleanRoute, cleanedFromLoops.size());
         }
-        List<PointDTO> rerouted = graphHopper.connectSnappedPointsWithRoutesNoClosing(List.of(initialRoute.get(loopStartPoint), initialRoute.get(loopEndingIndex)), grasshopperProfileFootShortest);
+        List<PointDTO> rerouted = graphHopper.connectSnappedPointsWithRoutesNoClosing(List.of(initialRoute.get(loopStartPoint), initialRoute.get(loopEndingIndex)), graphHopperProfileFootShortest);
 
         //case when there is no other way to get rid of this loop
         if (areTooSimilarCurves(rerouted, initialRoute, loopStartPoint, loopEndingIndex)) {

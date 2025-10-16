@@ -16,10 +16,9 @@ import java.util.List;
 
 public class LithuaniaTraverser {
 
-  //keeping grass hopper profile here in case it will be needed to rotate them here
-  public static String GRASSHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
+  public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed!!!
   private RouteGenerator routeGenerator = new RouteGenerator();
-  private GraphHopper graphHopper = new GraphHopper(GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+  private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
   private GpxOutput gpxOutput = new GpxOutput();
   private EfficiencyService efficiencyService = new EfficiencyService();
 
@@ -67,13 +66,13 @@ public class LithuaniaTraverser {
             //Snapping 333 routes per second
             //Total points: 27752, inside Lithuania: 5000, duration: 16 seconds
             //Snapping 312 routes per second
-            List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+            List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle);
 
             //Total points: 27752, inside Lithuania: 5000, duration: 38 seconds
             //Routing 131 routes per second
             //Total points: 21325, inside Lithuania: 2500, duration: 21 seconds
             //Routing 119 routes per second
-            List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+            List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
             //do i need both to snap and route? or this can be done in one?
 
             //first try: Total points: 21325, inside Lithuania: 2500, duration: 1805 seconds
@@ -142,28 +141,11 @@ public class LithuaniaTraverser {
     List<PointDTO> shifted = routePoints;
 
     for (int i = 0; i < 2; i++) {
-      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km, graphHopper, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop_maxDistance_loopStart_loopFinish_km, graphHopper, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
+      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
       shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
       shifted.add(shifted.get(0));
     }
     return shifted;
   }
-
-//  //doubled method, care!
-//  private List<PointDTO> removeLoopsByLoopingTheSameActions(List<PointDTO> routePoints) {
-//    double indicatorOfLoop = 0.3;
-//    List<PointDTO> noLoops = new ArrayList<>();
-//    List<PointDTO> noLoopsRouted;
-//    List<PointDTO> shifted = GeoUtils.addExtraPointsInBetweenExistingOnes(routePoints);
-//
-//
-//    for (int i = 0; i < 2; i++) {
-//      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop, graphHopper, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-//      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-//      shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
-//      shifted.add(shifted.get(0));
-//    }
-//    return shifted;
-//  }
 }

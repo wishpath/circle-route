@@ -17,19 +17,19 @@ import java.util.List;
 public class GraphHopper {
   public com.graphhopper.GraphHopper hopper;
 
-  public GraphHopper(String grasshopperProfileFootShortest) {
+  public GraphHopper(String graphHopperProfileFootShortest) {
     hopper = new com.graphhopper.GraphHopper()
         .setOSMFile("src/main/java/org/sa/map-data/lithuania-250930.osm.pbf")
         .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
         .setProfiles(
-            new Profile(grasshopperProfileFootShortest)
+            new Profile(graphHopperProfileFootShortest)
                 .setVehicle("foot")
                 .setWeighting("shortest")
         )
         .importOrLoad();
   }
 
-  public List<PointDTO> snapPointsOnRoadGrid(List<PointDTO> perfectCircle, String grassHopperProfile) {
+  public List<PointDTO> snapPointsOnRoadGrid(List<PointDTO> perfectCircle) {
     List<PointDTO> snapped = new ArrayList<>();
     for (PointDTO p : perfectCircle) {
       Snap snap = hopper.getLocationIndex().findClosest(p.latitude, p.longitude, EdgeFilter.ALL_EDGES);
@@ -58,13 +58,13 @@ public class GraphHopper {
   }
 
 
-  public List<PointDTO> connectSnappedPointsWithRoutesAndClose(List<PointDTO> snappedPoints, String grassHopperProfile) {
+  public List<PointDTO> connectSnappedPointsWithRoutesAndClose(List<PointDTO> snappedPoints, String graphHopperProfile) {
     List<PointDTO> routedPoints = new ArrayList<>();
     for (int i = 0; i < snappedPoints.size() - 1; i++) {
       PointDTO from = snappedPoints.get(i);
       PointDTO to = snappedPoints.get(i + 1);
 
-      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile(grassHopperProfile);
+      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile(graphHopperProfile);
       GHResponse rsp = hopper.route(req);
 
       if (!rsp.hasErrors()) {
@@ -79,7 +79,7 @@ public class GraphHopper {
     // close the loop
     PointDTO first = snappedPoints.get(0);
     PointDTO last = snappedPoints.get(snappedPoints.size() - 1);
-    GHRequest req = new GHRequest(last.latitude, last.longitude, first.latitude, first.longitude).setProfile(grassHopperProfile);
+    GHRequest req = new GHRequest(last.latitude, last.longitude, first.latitude, first.longitude).setProfile(graphHopperProfile);
     GHResponse rsp = hopper.route(req);
     if (!rsp.hasErrors()) {
       ResponsePath path = rsp.getBest();
@@ -89,13 +89,13 @@ public class GraphHopper {
     return routedPoints;
   }
 
-  public List<PointDTO> connectSnappedPointsWithRoutesNoClosing(List<PointDTO> snappedPoints, String grassHopperProfile) {
+  public List<PointDTO> connectSnappedPointsWithRoutesNoClosing(List<PointDTO> snappedPoints, String graphHopperProfile) {
     List<PointDTO> routedPoints = new ArrayList<>();
     for (int i = 0; i < snappedPoints.size() - 1; i++) {
       PointDTO from = snappedPoints.get(i);
       PointDTO to = snappedPoints.get(i + 1);
 
-      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile(grassHopperProfile);
+      GHRequest req = new GHRequest(from.latitude, from.longitude, to.latitude, to.longitude).setProfile(graphHopperProfile);
       GHResponse rsp = hopper.route(req);
 
       if (!rsp.hasErrors()) {

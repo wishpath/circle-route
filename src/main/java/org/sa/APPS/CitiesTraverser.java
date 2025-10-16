@@ -12,9 +12,9 @@ import java.util.Map;
 //check limited amount of routes, improve efficiency for the real scan and also check output on the map if there are some problems!
 public class CitiesTraverser {
   //keeping grass hopper profile here in case it will be needed to rotate them here
-  public static String GRASSHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
+  public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
   private RouteGenerator routeGenerator = new RouteGenerator();
-  private GraphHopper graphHopper = new GraphHopper(GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+  private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
   private GpxOutput gpxOutput = new GpxOutput();
   private EfficiencyService efficiencyService = new EfficiencyService();
 
@@ -143,8 +143,8 @@ public class CitiesTraverser {
       System.out.println("Circle length: "  + perimeter);
       city_townCenter.forEach((townName, center) -> {
         List<PointDTO> perfectCircle = routeGenerator.generatePerfectCirclePoints(center, finalPerimeter, MAX_DISTANCE_BETWEEN_POINTS_KM); // +0s
-        List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-        List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+        List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle);
+        List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
         List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
 
         EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(noLoopRoutedPoints);
@@ -171,8 +171,8 @@ public class CitiesTraverser {
 
 
     for (int i = 0; i < 2; i++) {
-      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop, graphHopper, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
-      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRASSHOPPER_PROFILE_FOOT_SHORTEST);
+      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop, graphHopper, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
+      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
       shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
       shifted.add(shifted.get(0));
     }
