@@ -29,8 +29,8 @@ public class LithuaniaTraverser {
   private static final double LAT_STEP_1000_M = 1000.0 / 111_320.0; // ≈ 0.00898 degrees ≈ 1 km
   private static final double LON_STEP_1000_M = 1000.0 / (111_320.0 * Math.cos(Math.toRadians(55.0))); // ≈ 0.0156 degrees ≈ 1 km at ~55°N private static final double STEP_KOEF = 10.0;
   private static final double LT_GRID_STEP_KM = 1.0;
-  private static final double CIRCLE_LENGTH_MIN = 15.0;
-  private static final double CIRCLE_LENGTH_MAX = 15.0;
+  private static final double CIRCLE_LENGTH_MIN = 40.0;
+  private static final double CIRCLE_LENGTH_MAX = 40.0;
   private static final double CIRCLE_LENGTH_STEP = 5.0;
 
   private static final int MAX_DISTANCE_BETWEEN_POINTS_KM = 2; // distance between ideal circle points
@@ -84,7 +84,7 @@ public class LithuaniaTraverser {
             //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 5
             //Total points: 13409, inside Lithuania: 300, duration: 91 seconds, OK routes: 4
             //Total points: 17588, inside Lithuania: 1000, duration: 327 seconds, OK routes: 7 , max efficiency: 70
-            if (eff.efficiencyPercent > 77) {
+            if (eff.efficiencyPercent > 70) {
               okInstances++;
               maxEfficiency = Math.max(maxEfficiency, eff.efficiencyPercent);
 
