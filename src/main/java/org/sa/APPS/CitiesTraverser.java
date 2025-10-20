@@ -18,8 +18,8 @@ public class CitiesTraverser {
   private GpxOutput gpxOutput = new GpxOutput();
   private EfficiencyService efficiencyService = new EfficiencyService();
 
-  private static final double CIRCLE_LENGTH_MIN = 20.0;
-  private static final double CIRCLE_LENGTH_MAX = 30.0;
+  private static final double CIRCLE_LENGTH_MIN = 10.0;
+  private static final double CIRCLE_LENGTH_MAX = 10.0;
   private static final double CIRCLE_LENGTH_STEP = 5.0;
   private static final int sizeInstances = ((int)((CIRCLE_LENGTH_MAX - CIRCLE_LENGTH_MIN) / CIRCLE_LENGTH_STEP)) + 1;
 
@@ -77,6 +77,34 @@ public class CitiesTraverser {
   public static final PointDTO KAZLU_RUDA_CENTER   = new PointDTO(54.7667, 23.5000);
   public static final PointDTO JONISKIS_CENTER = new PointDTO(56.2389, 23.6139);
 
+  public static final PointDTO AKMENE_CENTER         = new PointDTO(56.2500, 22.7500);
+  public static final PointDTO NAUJOJI_AKMENE_CENTER = new PointDTO(56.3167, 22.8833);
+  public static final PointDTO TYTUVENAI_CENTER      = new PointDTO(55.6000, 23.2000);
+  public static final PointDTO SVENCIONYS_CENTER     = new PointDTO(55.1500, 26.1500);
+  public static final PointDTO KYBARTAI_CENTER       = new PointDTO(54.6333, 22.7667);
+  public static final PointDTO SALCININKAI_CENTER    = new PointDTO(54.3167, 25.3833);
+  public static final PointDTO GARLIAVA_CENTER       = new PointDTO(54.8167, 23.8667);
+  public static final PointDTO RAUDONDVARIS_CENTER   = new PointDTO(54.9333, 23.7833);
+  public static final PointDTO SILALE_CENTER         = new PointDTO(55.4900, 22.1833);
+  public static final PointDTO KELME_CENTER          = new PointDTO(55.6333, 22.9333);
+  public static final PointDTO RADVILISKIS_CENTER    = new PointDTO(55.8167, 23.5333);
+  public static final PointDTO SEDUVA_CENTER         = new PointDTO(55.7667, 23.7667);
+  public static final PointDTO BAISOGALA_CENTER = new PointDTO(55.639352, 23.724759);
+  public static final PointDTO LINKUVA_CENTER        = new PointDTO(56.0833, 23.9667);
+  public static final PointDTO PASVALYS_CENTER       = new PointDTO(56.0594, 24.4033);
+  public static final PointDTO KARMELAVA_CENTER = new PointDTO(54.9670, 24.0830);
+  public static final PointDTO DUSETOS_CENTER = new PointDTO(55.7500, 25.7500);
+  public static final PointDTO VARNIAI_CENTER = new PointDTO(55.7333, 22.3667);
+  public static final PointDTO RAGUVA_CENTER = new PointDTO(55.6500, 24.4500);
+  public static final PointDTO AUKSTADVARIS_CENTER = new PointDTO(54.5833, 24.5333);
+  public static final PointDTO RIETAVAS_CENTER = new PointDTO(55.7225, 21.9322);
+  public static final PointDTO TRAKAI_CENTER = new PointDTO(54.643814, 24.934369);
+  public static final PointDTO KALVARIJA_CENTER = new PointDTO(54.415210, 23.226875);
+  public static final PointDTO LAZDIJAI_CENTER  = new PointDTO(54.2167, 23.4667);
+  public static final PointDTO SEDA_CENTER      = new PointDTO(56.0333, 22.9333);
+  public static final PointDTO RUMSISKES_CENTER = new PointDTO(54.867900, 24.216753);
+  public static final PointDTO VAISVYDAVA_CENTER = new PointDTO(54.847954, 24.034146);
+
 
   public static final Map<String, PointDTO> city_townCenter = Map.ofEntries(
       Map.entry("vilnius", VILNIUS_CENTER),
@@ -128,7 +156,34 @@ public class CitiesTraverser {
       Map.entry("kaisiadorys", KAISIADORYS_CENTER),
       Map.entry("prienai", PRIENAI_CENTER),
       Map.entry("kazlu_ruda", KAZLU_RUDA_CENTER),
-      Map.entry("joniskis", JONISKIS_CENTER)
+      Map.entry("joniskis", JONISKIS_CENTER),
+      Map.entry("akmene", AKMENE_CENTER),
+      Map.entry("naujoji_akmene", NAUJOJI_AKMENE_CENTER),
+      Map.entry("tytuvenai", TYTUVENAI_CENTER),
+      Map.entry("svencionys", SVENCIONYS_CENTER),
+      Map.entry("kybartai", KYBARTAI_CENTER),
+      Map.entry("salcininkai", SALCININKAI_CENTER),
+      Map.entry("garliava", GARLIAVA_CENTER),
+      Map.entry("raudondvaris", RAUDONDVARIS_CENTER),
+      Map.entry("silale", SILALE_CENTER),
+      Map.entry("kelme", KELME_CENTER),
+      Map.entry("radviliskis", RADVILISKIS_CENTER),
+      Map.entry("seduva", SEDUVA_CENTER),
+      Map.entry("baisogala", BAISOGALA_CENTER),
+      Map.entry("linkuva", LINKUVA_CENTER),
+      Map.entry("pasvalys", PASVALYS_CENTER),
+      Map.entry("karmelava", KARMELAVA_CENTER),
+      Map.entry("dusetos", DUSETOS_CENTER),
+      Map.entry("varniai", VARNIAI_CENTER),
+      Map.entry("raguva", RAGUVA_CENTER),
+      Map.entry("aukstadvaris", AUKSTADVARIS_CENTER),
+      Map.entry("rietavas", RIETAVAS_CENTER),
+      Map.entry("trakai", TRAKAI_CENTER),
+      Map.entry("kalvarija", KALVARIJA_CENTER),
+      Map.entry("lazdijai", LAZDIJAI_CENTER),
+      Map.entry("seda", SEDA_CENTER),
+      Map.entry("rumsiskes", RUMSISKES_CENTER),
+      Map.entry("vaisvydava", VAISVYDAVA_CENTER)
   );
 
   public void traverse() {
@@ -145,10 +200,10 @@ public class CitiesTraverser {
         List<PointDTO> perfectCircle = routeGenerator.generatePerfectCirclePoints(center, finalPerimeter, MAX_DISTANCE_BETWEEN_POINTS_KM); // +0s
         List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle);
         List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-        List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
+        //List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
 
-        EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(noLoopRoutedPoints);
-        gpxOutput.outputGPX(noLoopRoutedPoints, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName);
+        EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(routedClosedCircle);
+        gpxOutput.outputGPX(routedClosedCircle, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName);
       });
     }
 
