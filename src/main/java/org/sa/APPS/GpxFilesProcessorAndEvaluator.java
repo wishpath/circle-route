@@ -2,14 +2,13 @@ package org.sa.APPS;
 
 import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
-import org.sa.service.EfficiencyService;
-import org.sa.service.GpxOutput;
-import org.sa.service.GpxParser;
+import org.sa.service.*;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 
-public class GpxFilesInDirectoryEvaluatorApp {
+public class GpxFilesProcessorAndEvaluator {
   private static final String GPX_FOLDER = "src/main/java/org/sa/APPS/gpx_files_to_evaluate";
   //  private static final String GPX_FOLDER = "src/main/java/org/sa/output-gpx";
 
@@ -19,6 +18,7 @@ public class GpxFilesInDirectoryEvaluatorApp {
   }
 
   public static void evaluateGPXRoutesInDirectory(String path) {
+    RouteGenerator routeGenerator = new RouteGenerator();
     EfficiencyService efficiencyService = new EfficiencyService();
 
     File folder = new File(path);
@@ -37,14 +37,25 @@ public class GpxFilesInDirectoryEvaluatorApp {
       List<PointDTO> routePoints = GpxParser.parseGpxFile(gpxFile);
       if (routePoints.size() < 2) continue;
       //close route
-      if (!routePoints.get(0).equals(routePoints.get(routePoints.size() - 1))) routePoints.add(routePoints.get(0));
+      //if (!routePoints.get(0).equals(routePoints.get(routePoints.size() - 1))) routePoints.add(routePoints.get(0));
 
-      EfficiencyDTO eff = efficiencyService.getRouteEfficiency(routePoints);
+      //make route start and finish at most northern point
+      List<PointDTO> startingAtNorthRoute_closed = routeGenerator.startAndFinishRouteOnMostNorthernPoint(routePoints);
+      List<PointDTO> clockwiseRoute = routeGenerator.makeRouteClockwise(startingAtNorthRoute_closed);
+
+
+      String city = CitiesTraverser.city_townCenter.entrySet().stream()
+          .min(Comparator.comparingDouble(e -> GeoUtils.getDistanceBetweenLocations(e.getValue(), clockwiseRoute.get(0))))
+          .map(java.util.Map.Entry::getKey)
+          .orElse("Unknown");
+
+      EfficiencyDTO eff = efficiencyService.getRouteEfficiency(clockwiseRoute);
       efficiencyService.printRouteEfficiency(eff, gpxFile.getName());
+
       new GpxOutput().outputGPXToDir(
-          routePoints,
-          eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + gpxFile.getName() + "_" + (int)eff.routeAreaKm + "sqkm_" + counter++,
-          "src/main/java/org/sa/APPS/renamed");
+          clockwiseRoute,
+          city + "_" + (int)eff.routeLength + "km_" + eff.efficiencyPercent + "eff_" + (int)eff.routeAreaKm + "sqkm_" + eff.routeAreaPerKm + "sqkmpkm_" +  counter++,
+          "src/main/java/org/sa/APPS/processed/" + city);
     }
   }
 }

@@ -154,5 +154,26 @@ public class RouteGenerator {
     Collections.reverse(result);
     return result;
   }
+
+  public List<PointDTO> startAndFinishRouteOnMostNorthernPoint(List<PointDTO> route) {
+    if (route == null || route.isEmpty()) return List.of();
+    PointDTO northernmost = route.stream().max((a, b) -> Double.compare(a.latitude, b.latitude)).orElse(route.get(0));
+    int startIndex = route.indexOf(northernmost);
+    if (startIndex == 0) return route; // already starts at northernmost
+    List<PointDTO> reordered = new ArrayList<>(route.subList(startIndex, route.size()));
+    reordered.addAll(route.subList(0, startIndex));
+    reordered.add(reordered.get(0)); // close the loop
+    return reordered;
+  }
+
+  public List<PointDTO> makeRouteClockwise(List<PointDTO> route) {
+    if (route == null || route.size() < 3) return route;
+    double area = 0;
+    for (int i = 0; i < route.size() - 1; i++) {
+      PointDTO p1 = route.get(i), p2 = route.get(i + 1);
+      area += (p2.longitude - p1.longitude) * (p2.latitude + p1.latitude);
+    }
+    return area > 0 ? route : new ArrayList<>(route.reversed());
+  }
 }
 
