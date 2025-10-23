@@ -9,6 +9,10 @@
   </metadata>
   <trk>
     <name>New file 1</name>
+    <extensions>
+      <gpx_style:DisplayColor xmlns:gpx_style="http://www.topografix.com/GPX/gpx_style/0/2">#000000</gpx_style:DisplayColor>
+      <gpx_style:FillColor xmlns:gpx_style="http://www.topografix.com/GPX/gpx_style/0/2">#00FF00</gpx_style:FillColor>
+    </extensions>
     <trkseg>
       <trkpt lat="54.927023" lon="23.655469">
         <ele>24.5</ele>
