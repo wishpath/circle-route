@@ -19,7 +19,7 @@ public class GpxOutput {
       File dir = new File(outputDir);
       if (!dir.exists()) dir.mkdirs();
 
-      File gpxFile = new File(dir, circleFileName + ".gpx");
+      File gpxFile = new File(dir, circleFileName);
       try (FileWriter writer = new FileWriter(gpxFile)) {
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         writer.write("<gpx version=\"1.1\" creator=\"PointService\" xmlns=\"http://www.topografix.com/GPX/1/1\">\n");

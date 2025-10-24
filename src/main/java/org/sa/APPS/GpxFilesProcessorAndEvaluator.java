@@ -54,7 +54,7 @@ public class GpxFilesProcessorAndEvaluator {
 
       new GpxOutput().outputGPXToDir(
           clockwiseRoute,
-          city + "_" + (int)eff.routeLength + "km_" + eff.efficiencyPercent + "eff_" + (int)eff.routeAreaKm + "sqkm_" + counter++,
+          city + "_" + (int)eff.routeLength + "km_" + eff.efficiencyPercent + "eff_" + (int)eff.routeAreaKm + "sqkm_" + counter++ + ".gpx",
           "src/main/java/org/sa/APPS/processed/");
     }
   }

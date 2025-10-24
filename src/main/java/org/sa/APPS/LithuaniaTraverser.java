@@ -102,7 +102,7 @@ public class LithuaniaTraverser {
               gpxOutput.outputGPX(
                   noLoopRoutedPoints,
                   //eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + "_" + (int)eff.routeAreaKm + "sqkm_" + okInstances
-                  city + okInstances
+                  city + okInstances + ".gpx"
               );
             }
             if (lithuaniaInstances % 500 == 0) System.out.println(((lithuaniaInstances * 100) / 47456) + "%");

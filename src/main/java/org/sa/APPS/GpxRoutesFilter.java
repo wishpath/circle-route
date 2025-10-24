@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 public class GpxRoutesFilter {
   private static final String CENTER = "kaunas";
-  private static final int RADIUS_KM = 65;
-  private static final int MIN_EFFICIENCY = 74;
+  private static final int RADIUS_KM = 66;
+  private static final int MIN_EFFICIENCY = 66;
 
   private static final String SOURCE_DIR = "src/main/java/org/sa/routes";
   private static final String INTVL_EDGES_DIR = "src/main/java/org/sa/INTVL-taken";
@@ -31,14 +31,14 @@ public class GpxRoutesFilter {
     }
 
     int counter = 1;
-    for (File gpx : gpxRouteFiles) {
-      List<PointDTO> points = GpxParser.parseGpxFile(gpx);
+    for (File gpxFile : gpxRouteFiles) {
+      List<PointDTO> points = GpxParser.parseGpxFile(gpxFile);
       if (points.isEmpty()) continue;
 
       double distance = GeoUtils.getDistanceBetweenLocations(centerPoint, points.get(0));
       double efficiency = efficiencyService.getRouteEfficiency(points).efficiencyPercent;
       if (distance < RADIUS_KM && efficiency >= MIN_EFFICIENCY)
-        new GpxOutput().outputGPXToDir(points, gpx.getName().replace(".gpx", "_" + counter++), OUTPUT_DIR);
+        new GpxOutput().outputGPXToDir(points, gpxFile.getName().replace(".gpx", "_" + counter++ + ".gpx"), OUTPUT_DIR);
     }
 
     writeIntvlCityEdges(centerPoint);
