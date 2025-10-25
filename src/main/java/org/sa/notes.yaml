@@ -10,6 +10,7 @@ problems:
   - improve traversing lithuania speed: isWithinPolygon is processing the same thing over and over currently
   - double idealAreaKm = round2(GeoUtils.getCircleAreaByLength(routeLength)); // precalculate this and store to a map
   - loop profiles "foot", motorcycle and so on
+  - in filter: do no include route if it is within intvl routes. (95% of point are within polygon)
   - sliding efficiency window:
     - try "gravel bike" profile, try rerouting to opposite direction
 

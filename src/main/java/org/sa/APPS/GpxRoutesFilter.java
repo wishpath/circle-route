@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class GpxRoutesFilter {
   private static final String CENTER = "kaunas";
   private static final int RADIUS_KM = 66;
-  private static final int MIN_EFFICIENCY = 66;
+  private static final int MIN_EFFICIENCY = 0;
 
   private static final String SOURCE_DIR = "src/main/java/org/sa/routes";
   private static final String INTVL_EDGES_DIR = "src/main/java/org/sa/INTVL-taken";
