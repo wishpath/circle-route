@@ -16,7 +16,7 @@ problems:
 get maps:
   - find map of lithuania here:
     - https://download.geofabrik.de/europe.html
-      - unarchive an place in src/main/java/org/sa/map-data
+      - unarchive an place in src/main/java/org/sa/map_data
   - small portions of map, smaller than Lithuania:
     - https://garmin.bbbike.org/
   - large files like "europe" 30gb:

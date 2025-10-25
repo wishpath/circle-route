@@ -1,30 +1,10 @@
-package org.sa.APPS;
+package org.sa.map_data;
 
-import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
-import org.sa.service.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-//check limited amount of routes, improve efficiency for the real scan and also check output on the map if there are some problems!
-public class CitiesTraverser {
-  //keeping grass hopper profile here in case it will be needed to rotate them here
-  public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
-  private RouteGenerator routeGenerator = new RouteGenerator();
-  private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-  private GpxOutput gpxOutput = new GpxOutput();
-  private EfficiencyService efficiencyService = new EfficiencyService();
-
-  private static final double CIRCLE_LENGTH_MIN = 10.0;
-  private static final double CIRCLE_LENGTH_MAX = 10.0;
-  private static final double CIRCLE_LENGTH_STEP = 5.0;
-  private static final int sizeInstances = ((int)((CIRCLE_LENGTH_MAX - CIRCLE_LENGTH_MIN) / CIRCLE_LENGTH_STEP)) + 1;
-
-  private static final int MAX_DISTANCE_BETWEEN_POINTS_KM = 2; // distance between ideal circle points
-
+public class TownData {
   public static final PointDTO VILNIUS_CENTER   = new PointDTO(54.6872, 25.2797);
   public static final PointDTO KAUNAS_CENTER    = new PointDTO(54.8985, 23.9036);
   public static final PointDTO KLAIPEDA_CENTER  = new PointDTO(55.7033, 21.1443);
@@ -45,7 +25,6 @@ public class CitiesTraverser {
   public static final PointDTO KRETINGA_CENTER    = new PointDTO(55.8833, 21.2500);
   public static final PointDTO SILUTE_CENTER      = new PointDTO(55.3500, 21.4833);
   public static final PointDTO ROKISKIS_CENTER    = new PointDTO(55.9474, 25.5948);
-
   public static final PointDTO KURSENAI_CENTER     = new PointDTO(55.9850, 22.9361);
   public static final PointDTO BIRZAI_CENTER       = new PointDTO(56.2000, 24.7500);
   public static final PointDTO RASEINIAI_CENTER    = new PointDTO(55.3833, 23.1167);
@@ -76,7 +55,6 @@ public class CitiesTraverser {
   public static final PointDTO PRIENAI_CENTER      = new PointDTO(54.6333, 23.9500);
   public static final PointDTO KAZLU_RUDA_CENTER   = new PointDTO(54.7667, 23.5000);
   public static final PointDTO JONISKIS_CENTER = new PointDTO(56.2389, 23.6139);
-
   public static final PointDTO AKMENE_CENTER         = new PointDTO(56.2500, 22.7500);
   public static final PointDTO NAUJOJI_AKMENE_CENTER = new PointDTO(56.3167, 22.8833);
   public static final PointDTO TYTUVENAI_CENTER      = new PointDTO(55.6000, 23.2000);
@@ -105,8 +83,7 @@ public class CitiesTraverser {
   public static final PointDTO RUMSISKES_CENTER = new PointDTO(54.867900, 24.216753);
   public static final PointDTO VAISVYDAVA_CENTER = new PointDTO(54.847954, 24.034146);
 
-
-  public static final Map<String, PointDTO> city_townCenter = Map.ofEntries(
+  public static final Map<String, PointDTO> townName_townCenterPoint = Map.ofEntries(
       Map.entry("vilnius", VILNIUS_CENTER),
       Map.entry("kaunas", KAUNAS_CENTER),
       Map.entry("klaipeda", KLAIPEDA_CENTER),
@@ -185,52 +162,4 @@ public class CitiesTraverser {
       Map.entry("rumsiskes", RUMSISKES_CENTER),
       Map.entry("vaisvydava", VAISVYDAVA_CENTER)
   );
-
-  public void traverse() {
-    LocalDateTime start = LocalDateTime.now();
-
-    //Total instances: 150, duration: 31 seconds,  instances per second: 4
-    //Total instances: 150, duration: 60 seconds, instances per second: 2
-    //Total instances: 150, duration: 63 seconds, instances per second: 2
-    outer:
-    for (double perimeter = CIRCLE_LENGTH_MIN; perimeter <= CIRCLE_LENGTH_MAX; perimeter += CIRCLE_LENGTH_STEP) {
-      final double finalPerimeter = perimeter;
-      System.out.println("Circle length: "  + perimeter);
-      city_townCenter.forEach((townName, center) -> {
-        List<PointDTO> perfectCircle = routeGenerator.generatePerfectCirclePoints(center, finalPerimeter, MAX_DISTANCE_BETWEEN_POINTS_KM); // +0s
-        List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle);
-        List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-        //List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
-
-        EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(routedClosedCircle);
-        gpxOutput.outputGPX(routedClosedCircle, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName + ".gpx");
-      });
-    }
-
-
-    int instances = (city_townCenter.size() * sizeInstances);
-    int timeSeconds = (int) java.time.Duration.between(start, LocalDateTime.now()).toSeconds();
-    System.out.println(
-        "Total instances: " + instances +
-            ", duration: " + timeSeconds + " seconds, " +
-            "instances per second: " + ((timeSeconds != 0) ? (instances / timeSeconds) : "ALL_IN_ZERO_SECONDS")
-      );
-  }
-
-  //doubled method, care!
-  private List<PointDTO> removeLoopsByLoopingTheSameActions(List<PointDTO> routePoints) {
-    double indicatorOfLoop = 0.3;
-    List<PointDTO> noLoops = new ArrayList<>();
-    List<PointDTO> noLoopsRouted;
-    List<PointDTO> shifted = GeoUtils.addExtraPointsInBetweenExistingOnes(routePoints);
-
-
-    for (int i = 0; i < 2; i++) {
-      noLoops = routeGenerator.removeLoops(shifted, indicatorOfLoop, graphHopper, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-      noLoopsRouted = graphHopper.connectSnappedPointsWithRoutesAndClose(noLoops, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-      shifted = routeGenerator.shiftABtoBA_andReverse(noLoopsRouted);
-      shifted.add(shifted.get(0));
-    }
-    return shifted;
-  }
 }

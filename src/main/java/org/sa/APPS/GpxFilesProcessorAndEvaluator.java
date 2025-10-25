@@ -2,6 +2,7 @@ package org.sa.APPS;
 
 import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
+import org.sa.map_data.TownData;
 import org.sa.service.*;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class GpxFilesProcessorAndEvaluator {
       List<PointDTO> clockwiseRoute = routeGenerator.makeRouteClockwise(startingAtNorthRoute_closed);
 
 
-      String city = CitiesTraverser.city_townCenter.entrySet().stream()
+      String city = TownData.townName_townCenterPoint.entrySet().stream()
           .min(Comparator.comparingDouble(e -> GeoUtils.getDistanceBetweenLocations(e.getValue(), clockwiseRoute.get(0))))
           .map(java.util.Map.Entry::getKey)
           .orElse("Unknown");

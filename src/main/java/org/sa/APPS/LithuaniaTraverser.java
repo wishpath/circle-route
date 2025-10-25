@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
+import org.sa.map_data.TownData;
 import org.sa.service.*;
 
 import java.io.File;
@@ -92,7 +93,7 @@ public class LithuaniaTraverser {
               //Total points: 108486, inside Lithuania: 47456, duration: 13455 seconds, OK routes: 70 , max efficiency: 80
               //Total points: 216972, inside Lithuania: 93030, duration: 24414 seconds, OK routes: 47 , max efficiency: 84
               //15km: Total points: 108486, inside Lithuania: 53453, duration: 5612 seconds, OK routes: 84 , max efficiency: 85
-              String city = CitiesTraverser.city_townCenter.entrySet().stream()
+              String city = TownData.townName_townCenterPoint.entrySet().stream()
                   .min(Comparator.comparingDouble(e -> GeoUtils.getDistanceBetweenLocations(e.getValue(), noLoopRoutedPoints.get(0))))
                   .map(java.util.Map.Entry::getKey)
                   .orElse("Unknown");
@@ -120,7 +121,7 @@ public class LithuaniaTraverser {
   }
 
   private static Polygon getLithuaniaContour() {
-    List<PointDTO> lithuaniaContour = GpxParser.parseGpxFile(new File("src/main/java/org/sa/map-data/lithuania_super_rough_closed_contour.gpx"));
+    List<PointDTO> lithuaniaContour = GpxParser.parseGpxFile(new File("src/main/java/org/sa/map_data/lithuania_super_rough_closed_contour.gpx"));
     if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
     List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
     if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))

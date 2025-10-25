@@ -19,7 +19,7 @@ public class GraphHopper {
 
   public GraphHopper(String graphHopperProfileFootShortest) {
     hopper = new com.graphhopper.GraphHopper()
-        .setOSMFile("src/main/java/org/sa/map-data/lithuania-250930.osm.pbf")
+        .setOSMFile("src/main/java/org/sa/map_data/lithuania-250930.osm.pbf")
         .setGraphHopperLocation(Props.CACHE_FOLDER_NAME) //for new map data, please change this name, to build new chache
         .setProfiles(
             new Profile(graphHopperProfileFootShortest)

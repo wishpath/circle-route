@@ -1,6 +1,7 @@
 package org.sa.APPS;
 
 import org.sa.DTO.PointDTO;
+import org.sa.map_data.TownData;
 import org.sa.service.EfficiencyService;
 import org.sa.service.GeoUtils;
 import org.sa.service.GpxOutput;
@@ -24,7 +25,7 @@ public class GpxRoutesFilter {
     File[] gpxRouteFiles = new File(SOURCE_DIR).listFiles((d, n) -> n.toLowerCase().endsWith(".gpx"));
     if (gpxRouteFiles == null) return;
 
-    PointDTO centerPoint = CitiesTraverser.city_townCenter.get(CENTER);
+    PointDTO centerPoint = TownData.townName_townCenterPoint.get(CENTER);
     if (centerPoint == null) {
       System.err.println("Unknown center: " + CENTER);
       return;
