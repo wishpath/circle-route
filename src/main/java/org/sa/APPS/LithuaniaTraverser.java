@@ -18,7 +18,7 @@ import java.util.List;
 public class LithuaniaTraverser {
 
   public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed!!!
-  private RouteGenerator routeGenerator = new RouteGenerator();
+  private RouteGeneratorAndModifier routeGenerator = new RouteGeneratorAndModifier();
   private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
   private GpxOutput gpxOutput = new GpxOutput();
   private EfficiencyService efficiencyService = new EfficiencyService();

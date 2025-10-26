@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RouteGenerator {
+public class RouteGeneratorAndModifier {
 
   public List<PointDTO> generatePerfectCirclePoints(PointDTO center, double circleLengthKm, double maxDistanceBetweenPointsKm) {
     double earthRadiusKm = 6371.0;

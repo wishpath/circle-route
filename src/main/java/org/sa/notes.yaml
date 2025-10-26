@@ -1,5 +1,4 @@
 problems:
-  - GpxFilesProcessorAndEvaluator logging to console is off: filenames
   - filter routes by proximity to a given center and length point and make separate dir with copies that match
   - unify all routes by going clockwise and starting on the north
   - merge LithuaniaTraverser and CitiesTraverser?
