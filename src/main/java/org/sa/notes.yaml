@@ -1,17 +1,5 @@
 problems:
-  - filter routes by proximity to a given center and length point and make separate dir with copies that match
-  - unify all routes by going clockwise and starting on the north
-  - merge LithuaniaTraverser and CitiesTraverser?
-  - add more town centers so finding closest city would be more precise
-  - why no routes with intended length of 40km?
-  - for (; loopStartPoint < routedPoints.size(); loopStartPoint++) { //for efficiency move by some distance, like at least 50 meters
-  - //do i need both to snap and route? or this can be done in one?
-  - improve traversing lithuania speed: isWithinPolygon is processing the same thing over and over currently
-  - double idealAreaKm = round2(GeoUtils.getCircleAreaByLength(routeLength)); // precalculate this and store to a map
-  - loop profiles "foot", motorcycle and so on
   - in filter: do no include route if it is within intvl routes. (95% of point are within polygon)
-  - sliding efficiency window:
-    - try "gravel bike" profile, try rerouting to opposite direction
 
 get maps:
   - find map of lithuania here:
@@ -22,6 +10,16 @@ get maps:
   - large files like "europe" 30gb:
     - https://download.geofabrik.de/
 
-
 map format:
   - .osm
+
+maybe later:
+  - better route finding efficiency:
+    - do not apply all algorithm cycles all at once:
+        - only if route passes a certain threshold of efficiency:
+            - apply new improvement iteration
+            - increment efficiency threshold
+
+let's not:
+  - precalculate and store to memory idealAreaKm. Because this is insignificant calculation - only ads noise to code and imprecision
+  - merge LithuaniaTraverser and CitiesTraverser. Because each have separate function - LithuaniaTraverser - searches for new routes. CitiesTraverser displays town data and is good for quick tests.
