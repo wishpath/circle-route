@@ -1,5 +1,6 @@
 problems:
   - in filter: do no include route if it is within intvl routes. (95% of point are within polygon)
+      - use areMostPointsWithinPolygon, isPolygonWithinPolygon -> entirelyWithinPolygon
 
 get maps:
   - find map of lithuania here:

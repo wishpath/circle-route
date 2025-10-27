@@ -107,14 +107,15 @@ public class GeoUtils {
     return polygon.covers(new GeometryFactory().createPoint(new Coordinate(longitude, latitude)));
   }
 
-  public static double haversine(double lat1, double lon1, double lat2, double lon2) {
-    double R = 6371000;
-    double dLat = Math.toRadians(lat2 - lat1);
-    double dLon = Math.toRadians(lon2 - lon1);
-    double a = Math.sin(dLat/2)*Math.sin(dLat/2)
-        + Math.cos(Math.toRadians(lat1))*Math.cos(Math.toRadians(lat2))
-        * Math.sin(dLon/2)*Math.sin(dLon/2);
-    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  // Calculates the great-circle distance between two geographic coordinates using the Haversine formula.
+  public static double measureCircleDistanceHaversine(double startLatitudeY, double startLongitudeX, double endLatitudeY, double endLongitudeX) {
+    double earthRadiusMeters = 6371000;
+    double deltaLatitudeY = Math.toRadians(endLatitudeY - startLatitudeY);
+    double deltaLongitudeX = Math.toRadians(endLongitudeX - startLongitudeX);
+    double haversineValue = Math.sin(deltaLatitudeY/2)*Math.sin(deltaLatitudeY/2)
+        + Math.cos(Math.toRadians(startLatitudeY))*Math.cos(Math.toRadians(endLatitudeY))
+        * Math.sin(deltaLongitudeX/2)*Math.sin(deltaLongitudeX/2);
+    return 2 * earthRadiusMeters * Math.atan2(Math.sqrt(haversineValue), Math.sqrt(1 - haversineValue));
   }
 
   public static List<PointDTO> addExtraPointsInBetweenExistingOnes(List<PointDTO> routePoints) {
@@ -135,5 +136,38 @@ public class GeoUtils {
     }
     return enhancedRoute;
   }
+
+  // Checks if at least the given percentage of points from 'small' are inside 'big' polygon.
+  public static boolean areMostPointsWithinPolygon(List<PointDTO> smallPoints, List<PointDTO> bigPolygonPoints, int minOkPercentage) {
+    if (smallPoints.isEmpty() || bigPolygonPoints.size() < 3) return false;
+
+    GeometryFactory geometryFactory = new GeometryFactory();
+    Coordinate[] polygonCoordinates = bigPolygonPoints.stream()
+        .map(p -> new Coordinate(p.longitude, p.latitude))
+        .toArray(Coordinate[]::new);
+    Polygon polygon = geometryFactory.createPolygon(polygonCoordinates);
+
+    long insideCount = smallPoints.stream()
+        .filter(p -> polygon.covers(geometryFactory.createPoint(new Coordinate(p.longitude, p.latitude))))
+        .count();
+
+    double insidePercentage = (insideCount * 100.0) / smallPoints.size();
+    return insidePercentage >= minOkPercentage;
+  }
+
+  public static boolean isPolygonWithinPolygon(List<PointDTO> innerPolygonPoints, List<PointDTO> outerPolygonPoints) {
+    if (innerPolygonPoints.size() < 3 || outerPolygonPoints.size() < 3) return false;
+
+    GeometryFactory gf = new GeometryFactory();
+    Polygon innerPolygon = gf.createPolygon(innerPolygonPoints.stream()
+        .map(p -> new Coordinate(p.longitude, p.latitude))
+        .toArray(Coordinate[]::new));
+    Polygon outerPolygon = gf.createPolygon(outerPolygonPoints.stream()
+        .map(p -> new Coordinate(p.longitude, p.latitude))
+        .toArray(Coordinate[]::new));
+
+    return outerPolygon.covers(innerPolygon);
+  }
+
 }
 
