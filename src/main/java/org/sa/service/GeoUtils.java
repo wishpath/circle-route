@@ -1,11 +1,15 @@
 package org.sa.service;
 
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.operation.buffer.BufferOp;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.sa.DTO.PointDTO;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GeoUtils {
@@ -133,18 +137,28 @@ public class GeoUtils {
   public static boolean areMostPointsWithinPolygon(List<PointDTO> smallPoints, List<PointDTO> bigPolygonPoints, int minOkPercentage) {
     if (smallPoints.isEmpty() || bigPolygonPoints.size() < 3) return false;
 
-    GeometryFactory geometryFactory = new GeometryFactory();
-    Coordinate[] polygonCoordinates = bigPolygonPoints.stream()
-        .map(p -> new Coordinate(p.longitude, p.latitude))
-        .toArray(Coordinate[]::new);
-    Polygon polygon = geometryFactory.createPolygon(polygonCoordinates);
+    GeometryFactory gf = new GeometryFactory();
+    Coordinate[] ring = toClosedRing(bigPolygonPoints);
+    if (ring.length < 4) return false;
 
+    Polygon polygon = gf.createPolygon(ring);
     long insideCount = smallPoints.stream()
-        .filter(p -> polygon.covers(geometryFactory.createPoint(new Coordinate(p.longitude, p.latitude))))
+        .filter(p -> polygon.covers(gf.createPoint(new Coordinate(p.longitude, p.latitude))))
         .count();
 
-    double insidePercentage = (insideCount * 100.0) / smallPoints.size();
-    return insidePercentage >= minOkPercentage;
+    double insidePct = (insideCount * 100.0) / smallPoints.size();
+    return insidePct >= minOkPercentage;
+  }
+
+  private static Coordinate[] toClosedRing(List<PointDTO> pts) {
+    if (pts.size() < 3) return new Coordinate[0];
+    Coordinate[] coords = pts.stream()
+        .map(p -> new Coordinate(p.longitude, p.latitude))
+        .toArray(Coordinate[]::new);
+    if (coords[0].equals2D(coords[coords.length - 1])) return coords;
+    Coordinate[] closed = Arrays.copyOf(coords, coords.length + 1);
+    closed[closed.length - 1] = new Coordinate(coords[0]);
+    return closed;
   }
 
   public static boolean isPolygonWithinPolygon(List<PointDTO> innerPolygonPoints, List<PointDTO> outerPolygonPoints) {

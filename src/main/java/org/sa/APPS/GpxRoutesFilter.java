@@ -9,32 +9,38 @@ import org.sa.service.GpxParser;
 
 import java.io.File;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class GpxRoutesFilter {
-  private static final String CENTER = "kaunas";
+  private static final String MAIN_TOWN = "kaunas";
   private static final int RADIUS_KM = 66;
   private static final int MIN_EFFICIENCY = 0;
 
   private static final String SOURCE_DIR = "src/main/java/org/sa/routes";
   private static final String INTVL_EDGES_DIR = "src/main/java/org/sa/INTVL-taken";
-  private static final String OUTPUT_DIR = "src/main/java/org/sa/filtered/" + CENTER + "_radius" + RADIUS_KM + "_efficiency" + MIN_EFFICIENCY + "/";
+  private static final String OUTPUT_DIR = "src/main/java/org/sa/filtered/" + MAIN_TOWN + "_radius" + RADIUS_KM + "_efficiency" + MIN_EFFICIENCY + "/";
 
   public static void main(String[] args) {
     EfficiencyService efficiencyService = new EfficiencyService();
-    File[] gpxRouteFiles = new File(SOURCE_DIR).listFiles((d, n) -> n.toLowerCase().endsWith(".gpx"));
-    if (gpxRouteFiles == null) return;
+    File[] allGpxRouteFiles = new File(SOURCE_DIR).listFiles((d, n) -> n.toLowerCase().endsWith(".gpx"));
+    if (allGpxRouteFiles == null) return;
 
-    PointDTO centerPoint = TownData.townName_townCenterPoint.get(CENTER);
+    PointDTO centerPoint = TownData.townName_townCenterPoint.get(MAIN_TOWN);
     if (centerPoint == null) {
-      System.err.println("Unknown center: " + CENTER);
+      System.err.println("Unknown center: " + MAIN_TOWN);
       return;
     }
 
     int counter = 1;
-    for (File gpxFile : gpxRouteFiles) {
+    List<PointDTO> mainTownIntvlEdge = getMainTownIntvlEdge();
+    for (File gpxFile : allGpxRouteFiles) {
       List<PointDTO> points = GpxParser.parseGpxFile(gpxFile);
+
       if (points.isEmpty()) continue;
+      if (points.get(0).equals(points.getLast())) points.add(points.get(0));
+      if (mainTownIntvlEdge != null && GeoUtils.areMostPointsWithinPolygon(points, mainTownIntvlEdge, 95)) {
+        System.err.println(gpxFile.getName() + " is within " + MAIN_TOWN + " INTV edge and was excluded from filter output");
+        continue;
+      }
 
       double distance = GeoUtils.getDistanceBetweenLocations(centerPoint, points.get(0));
       double efficiency = efficiencyService.getRouteEfficiency(points).efficiencyPercent;
@@ -46,22 +52,10 @@ public class GpxRoutesFilter {
   }
 
   private static void writeIntvlCityEdges(PointDTO centerPoint) {
-    File[] allIntvlCityEdges = new File(INTVL_EDGES_DIR)
-        .listFiles((dir, fileName) -> fileName.toLowerCase().endsWith(".gpx"));
-    if (allIntvlCityEdges == null) {
-      System.out.println("No GPX files found in INTVL directory.");
-      return;
-    }
-
     Map<String, List<File>> closeCityName_gpxFiles = new HashMap<>();
-    Pattern validPattern = Pattern.compile("^\\d{4}_\\d{2}_\\d{2} [A-Za-z]+ .*\\.gpx$");
 
-    for (File cityEdgeFile : allIntvlCityEdges) {
-      String fileName = cityEdgeFile.getName();
-      if (!validPattern.matcher(fileName).matches())
-        throw new IllegalArgumentException("Filename: " + fileName + ". Must be 'YYYY_MM_DD CityName description.gpx'");
-
-      String cityName = fileName.split(" ")[1];
+    for (File cityEdgeFile : getAllIntvlCityEdgesFiles()) {
+      String cityName = cityEdgeFile.getName().split(" ")[1];
       List<PointDTO> routePoints = GpxParser.parseGpxFile(cityEdgeFile);
       boolean isClose = routePoints.stream()
           .anyMatch(p -> GeoUtils.getDistanceBetweenLocations(centerPoint, p) < RADIUS_KM);
@@ -75,4 +69,34 @@ public class GpxRoutesFilter {
     });
   }
 
+  private static File[] getAllIntvlCityEdgesFiles() {
+    File[] allIntvlCityEdges = new File(INTVL_EDGES_DIR)
+        .listFiles((dir, fileName) -> fileName.toLowerCase().endsWith(".gpx"));
+    if (allIntvlCityEdges == null) {
+      System.err.println("No GPX files found in INTVL directory.");
+      return null;
+    }
+    for (File cityEdgeFile : allIntvlCityEdges) {
+      if (!cityEdgeFile.getName().matches("^\\d{4}_\\d{2}_\\d{2} [A-Za-z]+ .*\\.gpx$"))
+        throw new IllegalArgumentException("Filename: " + cityEdgeFile.getName() + ". Must be 'YYYY_MM_DD CityName description.gpx'");
+    }
+    return allIntvlCityEdges;
+  }
+
+  private static List<PointDTO> getMainTownIntvlEdge() {
+    File[] allCityEdgeFiles = getAllIntvlCityEdgesFiles();
+    if (allCityEdgeFiles == null || allCityEdgeFiles.length == 0) return List.of();
+
+    List<File> mainCityFiles = Arrays.stream(allCityEdgeFiles)
+        .filter(f -> f.getName().toLowerCase().contains(" " + MAIN_TOWN.toLowerCase() + " "))
+        .toList();
+
+    if (mainCityFiles.isEmpty()) return List.of();
+
+    File latestMainCityFile = mainCityFiles.stream()
+        .max(Comparator.comparing(File::getName))
+        .orElse(null);
+
+    return latestMainCityFile == null ? List.of() : GpxParser.parseGpxFile(latestMainCityFile);
+  }
 }

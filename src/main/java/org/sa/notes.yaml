@@ -1,6 +1,8 @@
 problems:
   - in filter: do no include route if it is within intvl routes. (95% of point are within polygon)
-      - use areMostPointsWithinPolygon, isPolygonWithinPolygon -> entirelyWithinPolygon
+      - already excluded routes in MAIN TOWN ITVL EDGE
+      - exlude intvl edges in main town intvl edge
+      - exclude routes in all intvl town edges
 
 get maps:
   - find map of lithuania here:
