@@ -86,14 +86,6 @@ public class GeoUtils {
     return (circleLength * circleLength) / (4 * Math.PI);
   }
 
-  public static double getPizzaSliceAreaKm(List<PointDTO> pizzaCrust, PointDTO pizzaCenter) {
-    List<PointDTO> pizzaSlice = new ArrayList<>();
-    pizzaSlice.add(pizzaCenter);
-    pizzaSlice.addAll(pizzaCrust);
-    pizzaSlice.add(pizzaCenter);
-    return getRouteAreaKm(pizzaSlice);
-  }
-
   public static Polygon offsetPolygonInwards(Polygon jtsPolygon, double offsetValueKm) {
     // Offset inward (negative distance)
     BufferParameters params = new BufferParameters();
@@ -167,6 +159,16 @@ public class GeoUtils {
         .toArray(Coordinate[]::new));
 
     return outerPolygon.covers(innerPolygon);
+  }
+
+  public static boolean isPointWithinPolygon(PointDTO point, List<PointDTO> polygonPoints) {
+    if (polygonPoints.size() < 3) return false;
+    GeometryFactory geometryFactory = new GeometryFactory();
+    Polygon polygon = geometryFactory.createPolygon(
+        polygonPoints.stream()
+            .map(p -> new Coordinate(p.longitude, p.latitude))
+            .toArray(Coordinate[]::new));
+    return polygon.covers(geometryFactory.createPoint(new Coordinate(point.longitude, point.latitude)));
   }
 
 }
