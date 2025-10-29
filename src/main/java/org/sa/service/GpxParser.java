@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GpxParser {
-  public static List<PointDTO> parseGpxFile(File gpxFile) {
+  public static List<PointDTO> parseFromGpxFileToPoints(File gpxFile) {
     List<PointDTO> points = new ArrayList<>();
     try {
       var factory = DocumentBuilderFactory.newInstance();

@@ -11,10 +11,10 @@ import java.util.List;
 public class GpxOutput {
 
   public void outputGPX(List<PointDTO> circlePointsSnappedOnRoad, String circleFileName) { //overwrites
-    outputGPXToDir(circlePointsSnappedOnRoad, circleFileName, Props.GPX_OUTPUT_DIR);
+    outputPointsAsGPXToDirectory(circlePointsSnappedOnRoad, circleFileName, Props.GPX_OUTPUT_DIR);
   }
 
-  public void outputGPXToDir(List<PointDTO> circlePointsSnappedOnRoad, String circleFileName, String outputDir) { //overwrites
+  public void outputPointsAsGPXToDirectory(List<PointDTO> circlePointsSnappedOnRoad, String circleFileName, String outputDir) { //overwrites
     try {
       File dir = new File(outputDir);
       if (!dir.exists()) dir.mkdirs();

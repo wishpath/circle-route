@@ -1,4 +1,6 @@
 problems:
+  - optimise getIntvlCityEdgesNearby_singleAndLatestForTown vs writeIntvlCityEdges
+  - reduce some null checks
   - in filter: do no include route if it is within intvl routes. (95% of point are within polygon)
       - already excluded routes in MAIN TOWN ITVL EDGE
       - exlude intvl edges in main town intvl edge

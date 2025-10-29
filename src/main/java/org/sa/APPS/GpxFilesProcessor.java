@@ -23,7 +23,7 @@ public class GpxFilesProcessor {
 
     int counter = 1;
     for (File gpxFile : gpxFiles) {
-      List<PointDTO> unclosedRoutePoints = GpxParser.parseGpxFile(gpxFile);
+      List<PointDTO> unclosedRoutePoints = GpxParser.parseFromGpxFileToPoints(gpxFile);
       if (unclosedRoutePoints.size() < 2) continue;
 
       List<PointDTO> startingAtNorth_closedRoute = modifierService.startAndFinishRouteOnMostNorthernPoint(unclosedRoutePoints);
@@ -39,7 +39,7 @@ public class GpxFilesProcessor {
 
       efficiencyService.printRouteEfficiency(efficiency, circleFileName);
 
-      new GpxOutput().outputGPXToDir(clockwiseRouteClosed, circleFileName, PROCESSED_OUTPUT_DIRECTORY);
+      new GpxOutput().outputPointsAsGPXToDirectory(clockwiseRouteClosed, circleFileName, PROCESSED_OUTPUT_DIRECTORY);
     }
   }
 
