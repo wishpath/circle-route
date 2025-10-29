@@ -36,7 +36,7 @@ public class GpxOutput {
         writer.write("</gpx>\n");
       }
 
-      System.out.println("GPX file written to: " + gpxFile.getAbsolutePath());
+      System.out.println("GPX file written to: \u001B[34m" + gpxFile.getPath() + "\u001B[0m");
     } catch (IOException e) {
       throw new RuntimeException("Failed to write GPX file", e);
     }

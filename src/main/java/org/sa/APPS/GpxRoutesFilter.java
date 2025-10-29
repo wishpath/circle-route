@@ -64,26 +64,32 @@ public class GpxRoutesFilter {
 
   private static Map<String, List<PointDTO>> getTownsLatestIntvlEdge(File[] allIntvlCityEdges, PointDTO mainTownCenterPoint, List<PointDTO> mainTownIntvlEdge) {
     //find INTVL edges that are close enough and map them to their town names
-    Map<String, List<File>> filenameOfTownNearby_intvlEdgesGpxFiles = new HashMap<>();
+    Map<String, List<File>> filenameOfTownNearbyOrMain_intvlEdgesGpxFiles = new HashMap<>();
     for (File intvlCityEdgeFile : allIntvlCityEdges) {
       List<PointDTO> intvlCityEdgePoints = GpxParser.parseFromGpxFileToPoints(intvlCityEdgeFile);
 
-      //filter out ones that are far
+      //filter out ones that are far2025_10_21 kaunas INTVL taken.gpx
       boolean isIntvlEdgeCloseToMainTown = intvlCityEdgePoints.stream().anyMatch(cityEdgePoint -> GeoUtils.getDistanceBetweenLocations(mainTownCenterPoint, cityEdgePoint) < MAX_RADIUS_ALLOWED_KM);
       if (!isIntvlEdgeCloseToMainTown) {
+        System.out.println(intvlCityEdgeFile.getName() + " filtered out: too far");
         continue;
       }
       //filter out ones that are covered by main town INTVL edge
-      if (GeoUtils.areMostPointsWithinPolygon(intvlCityEdgePoints, mainTownIntvlEdge, 95) && !intvlCityEdgePoints.equals(mainTownIntvlEdge)) {
-        System.err.println(intvlCityEdgeFile.getName() + ": INTVL edge is within " + MAIN_TOWN + " INTVL edge and was excluded from filter output");
-        continue;
+      if (GeoUtils.areMostPointsWithinPolygon(intvlCityEdgePoints, mainTownIntvlEdge, 95)) {
+        if (intvlCityEdgePoints.equals(mainTownIntvlEdge)) {
+          System.out.println("\u001B[32mmain town latest edge: " + intvlCityEdgeFile.getName() + "\u001B[0m");
+        }
+        else {
+          System.err.println(intvlCityEdgeFile.getName() + ": INTVL edge is within " + MAIN_TOWN + " INTVL edge and was excluded from filter output");
+          continue;
+        }
       }
-      filenameOfTownNearby_intvlEdgesGpxFiles.computeIfAbsent(intvlCityEdgeFile.getName(), k -> new ArrayList<>()).add(intvlCityEdgeFile);
+      filenameOfTownNearbyOrMain_intvlEdgesGpxFiles.computeIfAbsent(intvlCityEdgeFile.getName(), k -> new ArrayList<>()).add(intvlCityEdgeFile);
     }
 
     //only keep latest single INTVL edge for each town
     Map<String, List<PointDTO>> filenameOfTownNearby_latestIntvlEdge = new HashMap<>();
-    filenameOfTownNearby_intvlEdgesGpxFiles.forEach((filenameOfTownNearby, intvlEdgesGpxFile) -> {
+    filenameOfTownNearbyOrMain_intvlEdgesGpxFiles.forEach((filenameOfTownNearby, intvlEdgesGpxFile) -> {
       File latestIntvlEdgesGpxFile = intvlEdgesGpxFile.stream().max(Comparator.comparing(File::getName)).orElse(null);
       if (latestIntvlEdgesGpxFile == null) {
         System.err.println("latestIntvlEdgesGpxFile should not be null here since it's the point of it being here.");

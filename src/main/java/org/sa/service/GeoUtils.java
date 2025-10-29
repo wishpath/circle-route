@@ -97,6 +97,13 @@ public class GeoUtils {
     Geometry offsetGeom = BufferOp.bufferOp(jtsPolygon, -offsetValueKm / 111.32, params);
     return (Polygon) offsetGeom;
   }
+  public static Polygon offsetPolygonOutwards(Polygon jtsPolygon, double offsetValueKm) {
+    // Offset inward (negative distance)
+    BufferParameters params = new BufferParameters();
+    params.setJoinStyle(BufferParameters.JOIN_BEVEL); // Straight truncation of corners — minimal computation
+    Geometry offsetGeom = BufferOp.bufferOp(jtsPolygon, offsetValueKm / 111.32, params);
+    return (Polygon) offsetGeom;
+  }
 
   public static boolean isWithinPolygon(Polygon polygon, double latitude, double longitude) {
     // Check if point is inside polygon (true if inside or on boundary)
@@ -137,53 +144,26 @@ public class GeoUtils {
   public static boolean areMostPointsWithinPolygon(List<PointDTO> smallPoints, List<PointDTO> bigPolygonPoints, int minOkPercentage) {
     if (smallPoints.isEmpty() || bigPolygonPoints.size() < 3) return false;
 
-    GeometryFactory gf = new GeometryFactory();
-    Coordinate[] ring = toClosedRing(bigPolygonPoints);
-    if (ring.length < 4) return false;
-
-    Polygon polygon = gf.createPolygon(ring);
+    GeometryFactory geoFactory = new GeometryFactory();
+    Polygon bigPolygon = geoFactory.createPolygon(toClosedRing(bigPolygonPoints));
+    Polygon slightBigPolygonOffset = offsetPolygonOutwards(bigPolygon, 0.1); //without offset, matching lines are sometimes counted outside
     long insideCount = smallPoints.stream()
-        .filter(p -> polygon.covers(gf.createPoint(new Coordinate(p.longitude, p.latitude))))
+        .filter(p -> slightBigPolygonOffset.covers(geoFactory.createPoint(new Coordinate(p.longitude, p.latitude))))
         .count();
 
-    double insidePct = (insideCount * 100.0) / smallPoints.size();
-    return insidePct >= minOkPercentage;
+    double percentageOfSmallPointsWithinBig = (insideCount * 100.0) / smallPoints.size();
+    return percentageOfSmallPointsWithinBig >= minOkPercentage;
   }
 
   private static Coordinate[] toClosedRing(List<PointDTO> pts) {
     if (pts.size() < 3) return new Coordinate[0];
-    Coordinate[] coords = pts.stream()
+    Coordinate[] coordinates = pts.stream()
         .map(p -> new Coordinate(p.longitude, p.latitude))
         .toArray(Coordinate[]::new);
-    if (coords[0].equals2D(coords[coords.length - 1])) return coords;
-    Coordinate[] closed = Arrays.copyOf(coords, coords.length + 1);
-    closed[closed.length - 1] = new Coordinate(coords[0]);
+    if (coordinates[0].equals2D(coordinates[coordinates.length - 1])) return coordinates;
+    Coordinate[] closed = Arrays.copyOf(coordinates, coordinates.length + 1);
+    closed[closed.length - 1] = new Coordinate(coordinates[0]);
     return closed;
   }
-
-  public static boolean isPolygonWithinPolygon(List<PointDTO> innerPolygonPoints, List<PointDTO> outerPolygonPoints) {
-    if (innerPolygonPoints.size() < 3 || outerPolygonPoints.size() < 3) return false;
-
-    GeometryFactory gf = new GeometryFactory();
-    Polygon innerPolygon = gf.createPolygon(innerPolygonPoints.stream()
-        .map(p -> new Coordinate(p.longitude, p.latitude))
-        .toArray(Coordinate[]::new));
-    Polygon outerPolygon = gf.createPolygon(outerPolygonPoints.stream()
-        .map(p -> new Coordinate(p.longitude, p.latitude))
-        .toArray(Coordinate[]::new));
-
-    return outerPolygon.covers(innerPolygon);
-  }
-
-  public static boolean isPointWithinPolygon(PointDTO point, List<PointDTO> polygonPoints) {
-    if (polygonPoints.size() < 3) return false;
-    GeometryFactory geometryFactory = new GeometryFactory();
-    Polygon polygon = geometryFactory.createPolygon(
-        polygonPoints.stream()
-            .map(p -> new Coordinate(p.longitude, p.latitude))
-            .toArray(Coordinate[]::new));
-    return polygon.covers(geometryFactory.createPoint(new Coordinate(point.longitude, point.latitude)));
-  }
-
 }
 
