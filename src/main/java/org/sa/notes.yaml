@@ -16,6 +16,9 @@ get maps:
 map format:
   - .osm
 
+check and edit gpx data:
+  - https://gpx.studio/
+
 maybe later:
   - better route finding efficiency:
     - do not apply all algorithm cycles all at once:
