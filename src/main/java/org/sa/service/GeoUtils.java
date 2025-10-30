@@ -109,6 +109,9 @@ public class GeoUtils {
     // Check if point is inside polygon (true if inside or on boundary)
     return polygon.covers(new GeometryFactory().createPoint(new Coordinate(longitude, latitude)));
   }
+  public static boolean isWithinPolygon(Polygon polygon, PointDTO point) {
+    return isWithinPolygon(polygon, point.latitude, point.longitude);
+  }
 
   // Calculates the great-circle distance between two geographic coordinates using the Haversine formula.
   public static double measureCircleDistanceHaversine(double startLatitudeY, double startLongitudeX, double endLatitudeY, double endLongitudeX) {
@@ -164,6 +167,16 @@ public class GeoUtils {
     Coordinate[] closed = Arrays.copyOf(coordinates, coordinates.length + 1);
     closed[closed.length - 1] = new Coordinate(coordinates[0]);
     return closed;
+  }
+
+  public static Polygon convertPointsToPolygon(List<PointDTO> points) {
+    if (points == null || points.size() < 3) return null;
+    GeometryFactory geoFactory = new GeometryFactory();
+    return geoFactory.createPolygon(toClosedRing(points));
+  }
+
+  public static Polygon offsetPolygonOutwards(List<PointDTO> mainTownIntvlEdge, int offsetKm) {
+    return offsetPolygonOutwards(convertPointsToPolygon(mainTownIntvlEdge), offsetKm);
   }
 }
 
