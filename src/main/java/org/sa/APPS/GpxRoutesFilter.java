@@ -84,6 +84,7 @@ public class GpxRoutesFilter {
           continue;
         }
       }
+      //theres a problem currently since they get grouped by filename - filename is unique so there is no grouping
       filenameOfTownNearbyOrMain_intvlEdgesGpxFiles.computeIfAbsent(intvlCityEdgeFile.getName(), k -> new ArrayList<>()).add(intvlCityEdgeFile);
     }
 

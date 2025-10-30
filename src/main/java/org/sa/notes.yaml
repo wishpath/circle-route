@@ -1,4 +1,7 @@
 problems:
+  - in filter "close" should be within min radius, but also within main town intvl edge offset by some value
+  - //theres a problem currently since they get grouped by filename - filename is unique so there is no grouping:
+    - filenameOfTownNearbyOrMain_intvlEdgesGpxFiles.computeIfAbsent(intvlCityEdgeFile.getName(), k -> new ArrayList<>()).add(intvlCityEdgeFile);
   - optimise getIntvlCityEdgesNearby_singleAndLatestForTown vs writeIntvlCityEdges
   - reduce some null checks
   - in filter: do no include route if it is within intvl routes. (95% of point are within polygon)
