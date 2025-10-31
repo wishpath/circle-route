@@ -1,13 +1,5 @@
 problems:
-  - in filter "close" should be within min radius, but also within main town intvl edge offset by some value
-  - //theres a problem currently since they get grouped by filename - filename is unique so there is no grouping:
-    - filenameOfTownNearbyOrMain_intvlEdgesGpxFiles.computeIfAbsent(intvlCityEdgeFile.getName(), k -> new ArrayList<>()).add(intvlCityEdgeFile);
-  - optimise getIntvlCityEdgesNearby_singleAndLatestForTown vs writeIntvlCityEdges
-  - reduce some null checks
-  - in filter: do no include route if it is within intvl routes. (95% of point are within polygon)
-      - already excluded routes in MAIN TOWN ITVL EDGE
-      - exlude intvl edges in main town intvl edge
-      - exclude routes in all intvl town edges
+  -
 
 get maps:
   - find map of lithuania here:
@@ -32,5 +24,6 @@ maybe later:
             - increment efficiency threshold
 
 let's not:
+  - pick latest intvl edges for each town by complex code logic - keep it simple and just drag old files to "old" directory.
   - precalculate and store to memory idealAreaKm. Because this is insignificant calculation - only ads noise to code and imprecision
   - merge LithuaniaTraverser and CitiesTraverser. Because each have separate function - LithuaniaTraverser - searches for new routes. CitiesTraverser displays town data and is good for quick tests.
