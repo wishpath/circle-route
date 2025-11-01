@@ -9,29 +9,38 @@ import org.sa.service.GpxOutput;
 import org.sa.service.GpxParser;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.*;
 
 public class GpxRoutesFilter {
-  private static final String MAIN_TOWN = "rokiskis"; // should be exact name of a town in TownData class
+  private static final String MAIN_TOWN = "kaunas"; // should be exact name of a town in TownData class
   private static final int MAX_CENTER_RADIUS_ALLOWED_KM = 70; // will get all the routes withing this radius
   private static final int MAX_EDGE_OFFSET_KM = 35; // will get all the routes withing this offset from current main town intvl edge
   private static final int MIN_EFFICIENCY_ALLOWED = 0; // will only take routes above this efficiency
   private static final String SOURCE_DIR_ALL_UNFILTERED_ROUTES = "src/main/java/org/sa/routes";
   private static final String INTVL_EDGES_DIR = "src/main/java/org/sa/INTVL-taken"; // data about mobile game INTVL (made manually)
-  private static final String OUTPUT_DIR = "src/main/java/org/sa/filtered/" + MAIN_TOWN + "_radius" + MAX_CENTER_RADIUS_ALLOWED_KM + "_efficiency" + MIN_EFFICIENCY_ALLOWED + "_offset" + MAX_EDGE_OFFSET_KM + "/";
+  private static final String OUTPUT_DIR =
+      "src/main/java/org/sa/filtered/" +
+      MAIN_TOWN +
+      LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("_yyyy_MM_dd")) +
+      "_radius" + MAX_CENTER_RADIUS_ALLOWED_KM +
+      "_efficiency" + MIN_EFFICIENCY_ALLOWED +
+      "_offset" + MAX_EDGE_OFFSET_KM + "/";
 
   public static void main(String[] args) {
 
     //prep data
     PointDTO mainTownCenterPoint = TownData.townName_townCenterPoint.get(MAIN_TOWN.toLowerCase());
     File[] allIntvlCityEdges = new File(INTVL_EDGES_DIR).listFiles((dir, fileName) -> fileName.toLowerCase().endsWith(".gpx"));
-    Arrays.stream(allIntvlCityEdges).filter(f -> !f.getName().matches("^\\d{4}_\\d{2}_\\d{2} [A-Za-z]+ .*\\.gpx$")).findAny().ifPresent(f -> { throw new IllegalArgumentException("Filename: " + f.getName() + ". Must be 'YYYY_MM_DD CityName description.gpx'"); });
+    Arrays.stream(allIntvlCityEdges).filter(f -> !f.getName().matches("^\\d{4}_\\d{2}_\\d{2} [A-Za-z]+ .*\\.gpx$")).findAny().ifPresent(f -> {
+      throw new IllegalArgumentException("Filename: " + f.getName() + ". Must be 'YYYY_MM_DD CityName description.gpx'");
+    });
     List<PointDTO> mainTownIntvlEdge = GpxParser.parseFromGpxFileToPoints(Arrays.stream(allIntvlCityEdges).filter(f -> f.getName().toLowerCase().contains(" " + MAIN_TOWN.toLowerCase() + " ")).max(Comparator.comparing(File::getName)).orElse(null));
     Polygon mainTownEdgeOffset = GeoUtils.offsetPolygonOutwards(mainTownIntvlEdge, MAX_EDGE_OFFSET_KM);
 
     //write good INTVL edges for each town
     Map<String, List<PointDTO>> intvlTownFilename_points = getGoodIntvlTownEdges(allIntvlCityEdges, mainTownCenterPoint, mainTownEdgeOffset, mainTownIntvlEdge);
-    intvlTownFilename_points.forEach((name, route) ->new GpxOutput().outputPointsAsGPXToDirectory(route, name, OUTPUT_DIR));
+    intvlTownFilename_points.forEach((name, route) -> new GpxOutput().outputPointsAsGPXToDirectory(route, name, OUTPUT_DIR));
 
     //write good circle-routes
     int passedFilterCount = 1;
@@ -85,8 +94,7 @@ public class GpxRoutesFilter {
       if (GeoUtils.areMostPointsWithinPolygon(intvlTownEdgePoints, mainTownIntvlEdge, 95)) {
         if (intvlTownEdgePoints.equals(mainTownIntvlEdge)) {
           System.out.println("\u001B[32mmain town latest edge: " + intvlCityEdgeFile.getName() + "\u001B[0m");
-        }
-        else {
+        } else {
           System.err.println(intvlCityEdgeFile.getName() + ": INTVL edge is within " + MAIN_TOWN + " INTVL edge and was excluded from filter output");
           continue;
         }
