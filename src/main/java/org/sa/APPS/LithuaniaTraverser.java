@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+//scans lithuania for the best circle routes
 public class LithuaniaTraverser {
 
   public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed!!!
-  private RouteGeneratorAndModifier routeGenerator = new RouteGeneratorAndModifier();
+  private RouteService routeGenerator = new RouteService();
   private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
   private GpxOutput gpxOutput = new GpxOutput();
   private EfficiencyService efficiencyService = new EfficiencyService();
@@ -47,71 +48,45 @@ public class LithuaniaTraverser {
     outer:
     for (double perimeter = CIRCLE_LENGTH_MIN; perimeter <= CIRCLE_LENGTH_MAX; perimeter += CIRCLE_LENGTH_STEP) {
 
-      Polygon ltOffset = GeoUtils.offsetPolygonInwards(lithuaniaContour, perimeter / 2);
+      Polygon ltOffset = GeoUtils.offsetPolygonInwards(lithuaniaContour, perimeter / 2); // so the route does not cross the border zone
       for (double latitude = LITHUANIA_MIN_LAT; latitude <= LITHUANIA_MAX_LAT; latitude += LT_GRID_STEP_KM * LAT_STEP_1000_M) {
         for (double longitude = LITHUANIA_MIN_LON; longitude <= LITHUANIA_MAX_LON; longitude += LT_GRID_STEP_KM * LON_STEP_1000_M) {
-          totalInstances++; //325 458
-          //if (lithuaniaInstances >= 1_000) break outer;
+          totalInstances++;
           if (GeoUtils.isWithinPolygon(ltOffset, latitude, longitude)) {
             lithuaniaInstances++;
 
-
-
-            //Total points: 108486, inside Lithuania: 47456, duration: 7 seconds
+            //pruduce route
             PointDTO center = new PointDTO(latitude, longitude); //+1 s
             List<PointDTO> perfectCircle = routeGenerator.generatePerfectCirclePoints(center, perimeter, MAX_DISTANCE_BETWEEN_POINTS_KM); // +0s
-
-            //Total points: 325458, inside Lithuania: 148305, duration: 447 seconds
-            //Snapping 332 routes per second
-            //Total points: 38843, inside Lithuania: 10000, duration: 30 seconds
-            //Snapping 333 routes per second
-            //Total points: 27752, inside Lithuania: 5000, duration: 16 seconds
-            //Snapping 312 routes per second
             List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle);
-
-            //Total points: 27752, inside Lithuania: 5000, duration: 38 seconds
-            //Routing 131 routes per second
-            //Total points: 21325, inside Lithuania: 2500, duration: 21 seconds
-            //Routing 119 routes per second
             List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-            //do i need both to snap and route? or this can be done in one?
-
-            //first try: Total points: 21325, inside Lithuania: 2500, duration: 1805 seconds
-            //second try: Total points: 15357, inside Lithuania: 1000, duration: 272 seconds
             List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle);
 
-            EfficiencyDTO eff = efficiencyService.getRouteEfficiency(noLoopRoutedPoints);
-            //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 24
-            //Total points: 11537, inside Lithuania: 100, duration: 30 seconds, OK routes: 5
-            //Total points: 13409, inside Lithuania: 300, duration: 91 seconds, OK routes: 4
-            //Total points: 17588, inside Lithuania: 1000, duration: 327 seconds, OK routes: 7 , max efficiency: 70
-            if (eff.efficiencyPercent >= 67) {
+            //if efficient — write to storage
+            EfficiencyDTO efficiency = efficiencyService.getRouteEfficiency(noLoopRoutedPoints);
+            if (efficiency.efficiencyPercent >= 67) {
               okInstances++;
-              maxEfficiency = Math.max(maxEfficiency, eff.efficiencyPercent);
+              maxEfficiency = Math.max(maxEfficiency, efficiency.efficiencyPercent);
 
-              //Total points: 17588, inside Lithuania: 1000, duration: 402 seconds, OK routes: 7 , max efficiency: 70
-              //Total points: 108486, inside Lithuania: 47456, duration: 13455 seconds, OK routes: 70 , max efficiency: 80
-              //Total points: 216972, inside Lithuania: 93030, duration: 24414 seconds, OK routes: 47 , max efficiency: 84
-              //15km: Total points: 108486, inside Lithuania: 53453, duration: 5612 seconds, OK routes: 84 , max efficiency: 85
-              String city = TownData.townName_townCenterPoint.entrySet().stream()
+              //name route/file by city name
+              String closestCity = TownData.townName_townCenterPoint.entrySet().stream()
                   .min(Comparator.comparingDouble(e -> GeoUtils.getDistanceBetweenLocations(e.getValue(), noLoopRoutedPoints.get(0))))
                   .map(java.util.Map.Entry::getKey)
                   .orElse("Unknown");
+              System.out.println(closestCity + " " +  efficiency);
 
-              System.out.println(city + " " +  eff);
-
-              gpxOutput.outputGPX(
-                  noLoopRoutedPoints,
-                  //eff.efficiencyPercent + "eff_" + (int)eff.routeLength + "km_" + "_" + (int)eff.routeAreaKm + "sqkm_" + okInstances
-                  city + okInstances + ".gpx"
-              );
+              gpxOutput.outputPointsAsGPX(noLoopRoutedPoints,closestCity + okInstances + ".gpx");
             }
-            if (lithuaniaInstances % 500 == 0) System.out.println(((lithuaniaInstances * 100) / 47456) + "%");
+
+            //print progress pseudo percentage
+            if (lithuaniaInstances % 500 == 0)
+              System.out.println(((lithuaniaInstances * 100) / 47456) + "%");
           }
         }
       }
     }
 
+    //end result console info
     System.out.println(
         "Total points: " + totalInstances +
         ", inside Lithuania: " + lithuaniaInstances +
@@ -121,7 +96,7 @@ public class LithuaniaTraverser {
   }
 
   private static Polygon getLithuaniaContour() {
-    List<PointDTO> lithuaniaContour = GpxParser.parseFromGpxFileToPoints(new File("src/main/java/org/sa/map_data/lithuania_super_rough_closed_contour.gpx"));
+    List<PointDTO> lithuaniaContour = GpxFileToPointsParser.parseFromGpxFileToPoints(new File("src/main/java/org/sa/map_data/lithuania_super_rough_closed_contour.gpx"));
     if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
     List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
     if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))

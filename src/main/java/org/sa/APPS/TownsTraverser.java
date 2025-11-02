@@ -13,7 +13,7 @@ import java.util.List;
 public class TownsTraverser {
   //keeping grass hopper profile here in case it will be needed to rotate them here
   public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
-  private RouteGeneratorAndModifier routeGenerator = new RouteGeneratorAndModifier();
+  private RouteService routeGenerator = new RouteService();
   private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
   private GpxOutput gpxOutput = new GpxOutput();
   private EfficiencyService efficiencyService = new EfficiencyService();
@@ -43,7 +43,7 @@ public class TownsTraverser {
         //List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
 
         EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(routedClosedCircle);
-        gpxOutput.outputGPX(routedClosedCircle, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName + ".gpx");
+        gpxOutput.outputPointsAsGPX(routedClosedCircle, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName + ".gpx");
       });
     }
 

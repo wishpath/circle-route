@@ -6,7 +6,7 @@ import org.sa.map_data.TownData;
 import org.sa.service.EfficiencyService;
 import org.sa.service.GeoUtils;
 import org.sa.service.GpxOutput;
-import org.sa.service.GpxParser;
+import org.sa.service.GpxFileToPointsParser;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -35,12 +35,12 @@ public class GpxRoutesFilter {
     Arrays.stream(allIntvlCityEdges).filter(f -> !f.getName().matches("^\\d{4}_\\d{2}_\\d{2} [A-Za-z]+ .*\\.gpx$")).findAny().ifPresent(f -> {
       throw new IllegalArgumentException("Filename: " + f.getName() + ". Must be 'YYYY_MM_DD CityName description.gpx'");
     });
-    List<PointDTO> mainTownIntvlEdge = GpxParser.parseFromGpxFileToPoints(Arrays.stream(allIntvlCityEdges).filter(f -> f.getName().toLowerCase().contains(" " + MAIN_TOWN.toLowerCase() + " ")).max(Comparator.comparing(File::getName)).orElse(null));
+    List<PointDTO> mainTownIntvlEdge = GpxFileToPointsParser.parseFromGpxFileToPoints(Arrays.stream(allIntvlCityEdges).filter(f -> f.getName().toLowerCase().contains(" " + MAIN_TOWN.toLowerCase() + " ")).max(Comparator.comparing(File::getName)).orElse(null));
     Polygon mainTownEdgeOffset = GeoUtils.offsetPolygonOutwards(mainTownIntvlEdge, MAX_EDGE_OFFSET_KM);
 
     //write good INTVL edges for each town
     Map<String, List<PointDTO>> intvlTownFilename_points = getGoodIntvlTownEdges(allIntvlCityEdges, mainTownCenterPoint, mainTownEdgeOffset, mainTownIntvlEdge);
-    intvlTownFilename_points.forEach((name, route) -> new GpxOutput().outputPointsAsGPXToDirectory(route, name, OUTPUT_DIR));
+    intvlTownFilename_points.forEach((name, route) -> new GpxOutput().outputPointsAsGPX(route, name, OUTPUT_DIR));
 
     //write good circle-routes
     int passedFilterCount = 1;
@@ -51,7 +51,7 @@ public class GpxRoutesFilter {
 
   private static int writeRouteIfPassedFilters(File unfilteredRouteGpxFile, PointDTO mainTownCenterPoint, Map<String, List<PointDTO>> filenameOfTownNearbyOrMain_latestIntvlEdge, int passedFilterCount, Polygon mainTownEdgeOffset) {
     //get route points
-    List<PointDTO> unfilteredRoutePoints = GpxParser.parseFromGpxFileToPoints(unfilteredRouteGpxFile);
+    List<PointDTO> unfilteredRoutePoints = GpxFileToPointsParser.parseFromGpxFileToPoints(unfilteredRouteGpxFile);
 
     //filter out: too far
     boolean isFarByRadius = GeoUtils.getDistanceBetweenLocations(mainTownCenterPoint, unfilteredRoutePoints.get(0)) > MAX_CENTER_RADIUS_ALLOWED_KM;
@@ -72,7 +72,7 @@ public class GpxRoutesFilter {
     }
 
     //route is good. write to output
-    new GpxOutput().outputPointsAsGPXToDirectory(unfilteredRoutePoints, unfilteredRouteGpxFile.getName().replace(".gpx", "_" + passedFilterCount++ + ".gpx"), OUTPUT_DIR);
+    new GpxOutput().outputPointsAsGPX(unfilteredRoutePoints, unfilteredRouteGpxFile.getName().replace(".gpx", "_" + passedFilterCount++ + ".gpx"), OUTPUT_DIR);
     return passedFilterCount;
   }
 
@@ -80,7 +80,7 @@ public class GpxRoutesFilter {
     Map<String, List<PointDTO>> intvlTownFilename_points = new HashMap<>();
 
     for (File intvlCityEdgeFile : allIntvlCityEdges) {
-      List<PointDTO> intvlTownEdgePoints = GpxParser.parseFromGpxFileToPoints(intvlCityEdgeFile);
+      List<PointDTO> intvlTownEdgePoints = GpxFileToPointsParser.parseFromGpxFileToPoints(intvlCityEdgeFile);
 
       //filter out ones that are far
       boolean isIntvlEdgeCloseToMainTown_byCenterRadius = intvlTownEdgePoints.stream().anyMatch(cityEdgePoint -> GeoUtils.getDistanceBetweenLocations(mainTownCenterPoint, cityEdgePoint) < MAX_CENTER_RADIUS_ALLOWED_KM);
