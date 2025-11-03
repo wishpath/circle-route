@@ -5,7 +5,7 @@ import org.sa.DTO.PointDTO;
 import org.sa.map_data.TownData;
 import org.sa.service.EfficiencyService;
 import org.sa.service.GeoUtils;
-import org.sa.service.GpxOutput;
+import org.sa.service.PointsWriterToGpxFile;
 import org.sa.service.GpxFileToPointsParser;
 
 import java.io.File;
@@ -40,7 +40,7 @@ public class GpxRoutesFilter {
 
     //write good INTVL edges for each town
     Map<String, List<PointDTO>> intvlTownFilename_points = getGoodIntvlTownEdges(allIntvlCityEdges, mainTownCenterPoint, mainTownEdgeOffset, mainTownIntvlEdge);
-    intvlTownFilename_points.forEach((name, route) -> new GpxOutput().outputPointsAsGPX(route, name, OUTPUT_DIR));
+    intvlTownFilename_points.forEach((name, route) -> new PointsWriterToGpxFile().outputPointsAsGPX(route, name, OUTPUT_DIR));
 
     //write good circle-routes
     int passedFilterCount = 1;
@@ -72,7 +72,7 @@ public class GpxRoutesFilter {
     }
 
     //route is good. write to output
-    new GpxOutput().outputPointsAsGPX(unfilteredRoutePoints, unfilteredRouteGpxFile.getName().replace(".gpx", "_" + passedFilterCount++ + ".gpx"), OUTPUT_DIR);
+    new PointsWriterToGpxFile().outputPointsAsGPX(unfilteredRoutePoints, unfilteredRouteGpxFile.getName().replace(".gpx", "_" + passedFilterCount++ + ".gpx"), OUTPUT_DIR);
     return passedFilterCount;
   }
 

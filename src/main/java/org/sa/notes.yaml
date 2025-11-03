@@ -1,5 +1,5 @@
 problems:
-  -
+  - TownsTraverser is very similar to LithuaniaTraverser. DRY?
 
 get maps:
   - find map of lithuania here:

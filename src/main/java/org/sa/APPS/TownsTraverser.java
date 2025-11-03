@@ -15,7 +15,7 @@ public class TownsTraverser {
   public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
   private RouteService routeGenerator = new RouteService();
   private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-  private GpxOutput gpxOutput = new GpxOutput();
+  private PointsWriterToGpxFile gpxOutput = new PointsWriterToGpxFile();
   private EfficiencyService efficiencyService = new EfficiencyService();
 
   private static final double CIRCLE_LENGTH_MIN = 10.0;
@@ -28,10 +28,6 @@ public class TownsTraverser {
 
   public void traverse() {
     LocalDateTime start = LocalDateTime.now();
-
-    //Total instances: 150, duration: 31 seconds,  instances per second: 4
-    //Total instances: 150, duration: 60 seconds, instances per second: 2
-    //Total instances: 150, duration: 63 seconds, instances per second: 2
     outer:
     for (double perimeter = CIRCLE_LENGTH_MIN; perimeter <= CIRCLE_LENGTH_MAX; perimeter += CIRCLE_LENGTH_STEP) {
       final double finalPerimeter = perimeter;
@@ -40,7 +36,7 @@ public class TownsTraverser {
         List<PointDTO> perfectCircle = routeGenerator.generatePerfectCirclePoints(center, finalPerimeter, MAX_DISTANCE_BETWEEN_POINTS_KM); // +0s
         List<PointDTO> snappedCircle = graphHopper.snapPointsOnRoadGrid(perfectCircle);
         List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-        //List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle); // doubled method from LithuaniaTraverse
+        List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle);
 
         EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(routedClosedCircle);
         gpxOutput.outputPointsAsGPX(routedClosedCircle, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName + ".gpx");

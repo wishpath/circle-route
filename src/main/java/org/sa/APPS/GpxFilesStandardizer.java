@@ -43,7 +43,7 @@ public class GpxFilesStandardizer {
       efficiencyService.printRouteEfficiency(efficiency, circleFileName);
 
       //write
-      new GpxOutput().outputPointsAsGPX(clockwiseRouteClosed, circleFileName, PROCESSED_OUTPUT_DIRECTORY);
+      new PointsWriterToGpxFile().outputPointsAsGPX(clockwiseRouteClosed, circleFileName, PROCESSED_OUTPUT_DIRECTORY);
     }
   }
 

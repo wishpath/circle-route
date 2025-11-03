@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class GpxOutput {
+public class PointsWriterToGpxFile {
 
   public void outputPointsAsGPX(List<PointDTO> circlePointsSnappedOnRoad, String circleFileName) { //overwrites
     outputPointsAsGPX(circlePointsSnappedOnRoad, circleFileName, Props.GPX_OUTPUT_DIR);

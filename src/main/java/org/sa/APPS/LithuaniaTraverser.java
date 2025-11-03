@@ -21,7 +21,7 @@ public class LithuaniaTraverser {
   public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed!!!
   private RouteService routeGenerator = new RouteService();
   private GraphHopper graphHopper = new GraphHopper(GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
-  private GpxOutput gpxOutput = new GpxOutput();
+  private PointsWriterToGpxFile gpxOutput = new PointsWriterToGpxFile();
   private EfficiencyService efficiencyService = new EfficiencyService();
 
   private static final double LITHUANIA_MIN_LAT = 53.88; // y, vertical
