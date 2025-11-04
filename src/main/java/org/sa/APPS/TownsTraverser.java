@@ -9,7 +9,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-//check limited amount of routes, improve efficiency for the real scan and also check output on the map if there are some problems!
+/**
+ * testing and experimentation class
+ * checks that a limited number of towns produces a limited number of routes
+ * provides a quick test compared to lithuania traverser class
+ * used for efficiency improvements
+ * checks gpx track output on the map
+ * sometimes used for visualizing town locations on the map
+ */
 public class TownsTraverser {
   //keeping grass hopper profile here in case it will be needed to rotate them here
   public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed
@@ -38,8 +45,8 @@ public class TownsTraverser {
         List<PointDTO> routedClosedCircle = graphHopper.connectSnappedPointsWithRoutesAndClose(snappedCircle, GRAPHHOPPER_PROFILE_FOOT_SHORTEST);
         List<PointDTO> noLoopRoutedPoints = removeLoopsByLoopingTheSameActions(routedClosedCircle);
 
-        EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(routedClosedCircle);
-        gpxOutput.outputPointsAsGPX(routedClosedCircle, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName + ".gpx");
+        EfficiencyDTO efficiencyDTO = efficiencyService.getRouteEfficiency(noLoopRoutedPoints);
+        gpxOutput.outputPointsAsGPX(noLoopRoutedPoints, efficiencyDTO.efficiencyPercent + "_"+ (int) efficiencyDTO.routeLength + "_" + townName + ".gpx");
       });
     }
 

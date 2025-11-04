@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-//scans lithuania for the best circle routes
+/**
+ * scans lithuania for the best circle routes
+ * */
 public class LithuaniaTraverser {
 
   public static String GRAPHHOPPER_PROFILE_FOOT_SHORTEST = "foot_shortest"; // delete cache when changed!!!
