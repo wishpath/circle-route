@@ -91,30 +91,32 @@ public class GeoUtils {
   }
 
   public static Polygon offsetPolygonInwards(Polygon jtsPolygon, double offsetValueKm) {
-    // Offset inward (negative distance)
     BufferParameters params = new BufferParameters();
     params.setJoinStyle(BufferParameters.JOIN_BEVEL); // Straight truncation of corners — minimal computation
     Geometry offsetGeom = BufferOp.bufferOp(jtsPolygon, -offsetValueKm / 111.32, params);
     return (Polygon) offsetGeom;
   }
   public static Polygon offsetPolygonOutwards(Polygon jtsPolygon, double offsetValueKm) {
-    // Offset inward (negative distance)
     BufferParameters params = new BufferParameters();
     params.setJoinStyle(BufferParameters.JOIN_BEVEL); // Straight truncation of corners — minimal computation
     Geometry offsetGeom = BufferOp.bufferOp(jtsPolygon, offsetValueKm / 111.32, params);
     return (Polygon) offsetGeom;
   }
 
+  public static Polygon offsetPolygonOutwards(List<PointDTO> mainTownIntvlEdge, int offsetKm) {
+    return offsetPolygonOutwards(convertPointsToPolygon(mainTownIntvlEdge), offsetKm);
+  }
   public static boolean isWithinPolygon(Polygon polygon, double latitude, double longitude) {
     // Check if point is inside polygon (true if inside or on boundary)
     return polygon.covers(new GeometryFactory().createPoint(new Coordinate(longitude, latitude)));
   }
+
   public static boolean isWithinPolygon(Polygon polygon, PointDTO point) {
     return isWithinPolygon(polygon, point.latitude, point.longitude);
   }
 
-  // Calculates the great-circle distance between two geographic coordinates using the Haversine formula.
-  public static double measureCircleDistanceHaversine(double startLatitudeY, double startLongitudeX, double endLatitudeY, double endLongitudeX) {
+  /** Calculates the great-circle distance between two geographic coordinates using the Haversine formula.*/
+  public static double measureCircleDistanceHaversineMeters(double startLatitudeY, double startLongitudeX, double endLatitudeY, double endLongitudeX) {
     double earthRadiusMeters = 6371000;
     double deltaLatitudeY = Math.toRadians(endLatitudeY - startLatitudeY);
     double deltaLongitudeX = Math.toRadians(endLongitudeX - startLongitudeX);
@@ -143,12 +145,12 @@ public class GeoUtils {
     return enhancedRoute;
   }
 
-  // Checks if at least the given percentage of points from 'small' are inside 'big' polygon.
+  /** Checks if at least the given percentage of points from 'small' are inside 'big' polygon.*/
   public static boolean areMostPointsWithinPolygon(List<PointDTO> smallPoints, List<PointDTO> bigPolygonPoints, int minOkPercentage) {
     if (smallPoints.isEmpty() || bigPolygonPoints.size() < 3) return false;
 
     GeometryFactory geoFactory = new GeometryFactory();
-    Polygon bigPolygon = geoFactory.createPolygon(toClosedRing(bigPolygonPoints));
+    Polygon bigPolygon = geoFactory.createPolygon(closeLoop(bigPolygonPoints));
     Polygon slightBigPolygonOffset = offsetPolygonOutwards(bigPolygon, 0.1); //without offset, matching lines are sometimes counted outside
     long insideCount = smallPoints.stream()
         .filter(p -> slightBigPolygonOffset.covers(geoFactory.createPoint(new Coordinate(p.longitude, p.latitude))))
@@ -158,9 +160,11 @@ public class GeoUtils {
     return percentageOfSmallPointsWithinBig >= minOkPercentage;
   }
 
-  private static Coordinate[] toClosedRing(List<PointDTO> pts) {
-    if (pts.size() < 3) return new Coordinate[0];
-    Coordinate[] coordinates = pts.stream()
+  /** Converts a list of points into a closed coordinate ring:
+   *  ensures first and last coordinates are identical so the shape forms a loop. */
+  private static Coordinate[] closeLoop(List<PointDTO> points) {
+    if (points.size() < 3) return new Coordinate[0];
+    Coordinate[] coordinates = points.stream()
         .map(p -> new Coordinate(p.longitude, p.latitude))
         .toArray(Coordinate[]::new);
     if (coordinates[0].equals2D(coordinates[coordinates.length - 1])) return coordinates;
@@ -172,11 +176,7 @@ public class GeoUtils {
   public static Polygon convertPointsToPolygon(List<PointDTO> points) {
     if (points == null || points.size() < 3) return null;
     GeometryFactory geoFactory = new GeometryFactory();
-    return geoFactory.createPolygon(toClosedRing(points));
-  }
-
-  public static Polygon offsetPolygonOutwards(List<PointDTO> mainTownIntvlEdge, int offsetKm) {
-    return offsetPolygonOutwards(convertPointsToPolygon(mainTownIntvlEdge), offsetKm);
+    return geoFactory.createPolygon(closeLoop(points));
   }
 }
 

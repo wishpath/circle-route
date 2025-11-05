@@ -43,7 +43,7 @@ public class GraphHopper {
 
         for (int i = 0; i < nodes; i++) {
           double lat = nodeAccess.getLat(i), lon = nodeAccess.getLon(i);
-          double dist = GeoUtils.measureCircleDistanceHaversine(p.latitude, p.longitude, lat, lon);
+          double dist = GeoUtils.measureCircleDistanceHaversineMeters(p.latitude, p.longitude, lat, lon);
           if (dist < bestDist) {
             bestDist = dist;
             bestLat = lat; bestLon = lon;
