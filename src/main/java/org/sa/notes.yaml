@@ -1,6 +1,4 @@
 problems:
-  - TownsTraverser is very similar to LithuaniaTraverser. DRY?
-    - Use traverseService, where the other services are located
 
 get maps:
   - find map of lithuania here:
