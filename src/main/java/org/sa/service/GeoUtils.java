@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Supplies geographic utilities for distance, area, polygon offsets, containment checks,
+ * and various geometric computations essential for evaluating and manipulating routes.
+ */
 public class GeoUtils {
 
   /**

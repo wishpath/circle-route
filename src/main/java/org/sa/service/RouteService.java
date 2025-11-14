@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Provides utilities for constructing ideal circle geometries, cleaning routes by removing loops,
+ * reshaping point sequences, and standardizing route orientation and starting position.
+ */
 public class RouteService {
 
   public List<PointDTO> generatePerfectCirclePoints(PointDTO center, double circleLengthKm, double maxDistanceBetweenPointsKm) {

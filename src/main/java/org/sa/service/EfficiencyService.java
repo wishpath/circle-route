@@ -5,7 +5,10 @@ import org.sa.DTO.PointDTO;
 
 import java.util.List;
 
-
+/**
+ * Evaluates a routed loop by measuring its length, enclosed area, and efficiency
+ * relative to an ideal same-length circle.
+ */
 public class EfficiencyService {
   public EfficiencyDTO getRouteEfficiency(List<PointDTO> routePoints) {
     double routeLength = round2(GeoUtils.autoCloseRouteAndGetLengthKm(routePoints));

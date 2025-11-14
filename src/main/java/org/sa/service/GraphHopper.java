@@ -14,6 +14,10 @@ import org.sa.config.Props;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Wraps GraphHopper routing to snap points onto the road network and build routed paths
+ * by connecting them, optionally closing the loop.
+ */
 public class GraphHopper {
   public com.graphhopper.GraphHopper hopper;
 

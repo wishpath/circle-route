@@ -17,7 +17,7 @@ public class LithuaniaTraverser {
 
   TraverseService service = new TraverseService();
 
-  //extream coordinates of Lithuania - most northern, southern, eastern and western points
+  //extreme coordinates of Lithuania - most northern, southern, eastern and western points
   private static final double LITHUANIA_MIN_LAT = 53.88; // y, vertical
   private static final double LITHUANIA_MAX_LAT = 56.45; // y, vertical
   private static final double LITHUANIA_MIN_LON = 20.93; // x, horizontal
