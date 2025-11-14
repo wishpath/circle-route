@@ -25,6 +25,7 @@ Download an `.osm.pbf` file for your region from:
 - https://garmin.bbbike.org/
 
 Place the file in your **map_data directory**, then update the GraphHopper file path.
+I recommend to list your map data file in the .gitignore file. 
 
 ---
 
@@ -33,7 +34,6 @@ Place the file in your **map_data directory**, then update the GraphHopper file 
 2. Draw the outer boundary of your region.
 3. Export as GPX.
 4. Save it into the **map_data directory**.
-5. Update the code where the Lithuania boundary is loaded.
 
 ---
 
@@ -48,5 +48,6 @@ Use `LithuaniaTraverser` as an example and configure:
 - grid step
 - circle length range
 - your boundary GPX
+- passable efficiency for output routes.
 
 Then scan and evaluate routes.
