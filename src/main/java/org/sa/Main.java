@@ -1,10 +1,10 @@
 package org.sa;
 
-import org.sa.APPS.LithuaniaTraverser;
+import org.sa.APPS.LithuaniaTraverserApp;
 
 public class Main {
   public static void main(String[] args) {
-    new LithuaniaTraverser().traverse();
+    new LithuaniaTraverserApp().traverse();
     //new TownsTraverser().traverse();
   }
 }

@@ -17,7 +17,7 @@ import java.util.List;
  * checks gpx track output on the map
  * sometimes used for visualizing town locations on the map
  */
-public class TownsTraverser {
+public class TownsTraverserApp {
   TraverseService service = new TraverseService();
 
   //variety of circle lengths

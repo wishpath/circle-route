@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Standardizes GPX route files by: starting point, route direction and file name
  * */
-public class GpxFilesStandardizer {
+public class GpxFilesStandardizerApp {
 
   public static final String GPX_FILES_TO_STANDARDIZE_DIRECTORY = "src/main/java/org/sa/APPS/gpx_files_standardizer/gpx_files_to_standardize";
   public static final String STANDARDIZED_OUTPUT_DIRECTORY = "src/main/java/org/sa/APPS/gpx_files_standardizer/standardized_output";

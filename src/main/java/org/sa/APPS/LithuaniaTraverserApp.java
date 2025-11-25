@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * scans lithuania for the best circle routes
  * */
-public class LithuaniaTraverser {
+public class LithuaniaTraverserApp {
 
   TraverseService service = new TraverseService();
 
