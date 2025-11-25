@@ -1,4 +1,4 @@
-package org.sa.config;
+package org.sa.a_settings;
 
 import org.sa.DTO.PointDTO;
 

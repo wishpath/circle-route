@@ -1,7 +1,7 @@
 package org.sa.service;
 
 import org.sa.DTO.PointDTO;
-import org.sa.config.Props;
+import org.sa.a_settings.Props;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -9,7 +9,7 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.storage.index.Snap;
 import org.sa.DTO.PointDTO;
-import org.sa.config.Props;
+import org.sa.a_settings.Props;
 
 import java.util.ArrayList;
 import java.util.List;

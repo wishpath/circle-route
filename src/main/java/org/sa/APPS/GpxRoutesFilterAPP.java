@@ -12,15 +12,15 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
 
-public class GpxRoutesFilter {
+public class GpxRoutesFilterAPP {
   private static final String MAIN_TOWN = "kaunas"; // should be exact name of a town in TownData class
-  private static final int MAX_CENTER_RADIUS_ALLOWED_KM = 70; // will get all the routes withing this radius
+  private static final int MAX_CENTER_RADIUS_ALLOWED_KM = 71; // will get all the routes withing this radius
   private static final int MAX_EDGE_OFFSET_KM = 35; // will get all the routes withing this offset from current main town intvl edge
   private static final int MIN_EFFICIENCY_ALLOWED = 0; // will only take routes above this efficiency
-  private static final String SOURCE_DIR_ALL_UNFILTERED_ROUTES = "src/main/java/org/sa/routes";
+  private static final String SOURCE_DIR_ALL_UNFILTERED_ROUTES = "src/main/java/org/sa/b_storage/routes";
   private static final String INTVL_EDGES_DIR = "src/main/java/org/sa/INTVL-taken"; // data about mobile game INTVL (made manually)
   private static final String OUTPUT_DIR =
-      "src/main/java/org/sa/filtered/" +
+      "src/main/java/org/sa/b_storage/filtered/" +
       MAIN_TOWN +
       LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("_yyyy_MM_dd")) +
       "_radius" + MAX_CENTER_RADIUS_ALLOWED_KM +
