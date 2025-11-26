@@ -1,4 +1,4 @@
-package org.sa.map_data;
+package org.sa.b_storage;
 
 import org.sa.DTO.PointDTO;
 

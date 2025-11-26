@@ -35,7 +35,8 @@ public class TraverseService {
   }
 
   public Polygon getLithuaniaContour() {
-    List<PointDTO> lithuaniaContour = GpxFileToPointsParser.parseFromGpxFileToPoints(new File("src/main/java/org/sa/map_data/lithuania_super_rough_closed_contour.gpx"));
+    //TODO: path changed but not tested 2025 11 26
+    List<PointDTO> lithuaniaContour = GpxFileToPointsParser.parseFromGpxFileToPoints(new File("src/main/java/org/sa/b_storage/lithuania_super_rough_closed_contour.gpx"));
     if (lithuaniaContour.size() < 3) throw new RuntimeException("LITHUANIA CONTOUR HAS LESS THAN 3 POINTS");
     List<PointDTO> lithuaniaContourClosed = new ArrayList<>(lithuaniaContour);
     if (!lithuaniaContourClosed.get(0).equals(lithuaniaContourClosed.get(lithuaniaContourClosed.size() - 1)))

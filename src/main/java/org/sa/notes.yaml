@@ -1,6 +1,6 @@
 problems:
-  - continue b_storage package refactoring
-  -
+  - test b_storage (after refactoring) (code locations commented with "TODO")
+
 get maps:
   - find map of lithuania here:
     - https://download.geofabrik.de/europe.html

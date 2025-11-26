@@ -12,6 +12,6 @@ public class Props {
   //cache folder name
   public static String CACHE_FOLDER_NAME = Props.DATA_NAME + "-graph-cache"; //don't change since it is defined in gitignore
 
-  //output dir
-  public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/output-gpx";
+  //output dir TODO: changed path but not tested 2025 11 26
+  public static String GPX_OUTPUT_DIR = "src/main/java/org/sa/b_storage/traverser-output-gpx";
 }

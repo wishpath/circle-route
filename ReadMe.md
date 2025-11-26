@@ -33,7 +33,8 @@ I recommend to list your map data file in the .gitignore file.
 1. Open https://gpx.studio/
 2. Draw the outer boundary of your region.
 3. Export as GPX.
-4. Save it into the **map_data directory**.
+4. Save it into the **b_storage directory**.
+   1. update path in method getLithuaniaContour() or create a new method.
 
 ---
 

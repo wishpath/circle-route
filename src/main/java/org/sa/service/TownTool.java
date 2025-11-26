@@ -1,7 +1,7 @@
 package org.sa.service;
 
 import org.sa.DTO.PointDTO;
-import org.sa.map_data.TownData;
+import org.sa.b_storage.TownData;
 
 import java.util.Comparator;
 import java.util.List;

@@ -2,7 +2,7 @@ package org.sa.APPS;
 
 import org.locationtech.jts.geom.Polygon;
 import org.sa.DTO.PointDTO;
-import org.sa.map_data.TownData;
+import org.sa.b_storage.TownData;
 import org.sa.service.EfficiencyService;
 import org.sa.service.GeoUtils;
 import org.sa.service.PointsWriterToGpxFile;

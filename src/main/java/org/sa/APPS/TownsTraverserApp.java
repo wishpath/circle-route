@@ -2,7 +2,7 @@ package org.sa.APPS;
 
 import org.sa.DTO.EfficiencyDTO;
 import org.sa.DTO.PointDTO;
-import org.sa.map_data.TownData;
+import org.sa.b_storage.TownData;
 import org.sa.service.TraverseService;
 
 import java.time.Duration;
