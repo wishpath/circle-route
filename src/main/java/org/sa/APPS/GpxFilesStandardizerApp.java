@@ -8,8 +8,15 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Standardizes GPX route files by: starting point, route direction and file name
- * */
+ * Standardizes GPX routes (northernmost start point, clockwise loop).
+ *
+ * Changed filenames include calculated:
+ * - Closest town name
+ * - Total length (km)
+ * - Shape efficiency (%)
+ * - Enclosed area (sq km)
+ * - File index counter
+ */
 public class GpxFilesStandardizerApp {
 
   //TODO: paths were changed but not tested 2025 11 26

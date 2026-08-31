@@ -52,3 +52,19 @@ Use `LithuaniaTraverser` as an example and configure:
 - passable efficiency for output routes.
 
 Then scan and evaluate routes.
+
+# CALCULATE-ROUTE-EFFICIENCY
+
+To standardize existing GPX routes and calculate efficiency metrics:
+1. Open `GpxFilesStandardizerApp.java`.
+2. Set `GPX_FILES_TO_STANDARDIZE_DIRECTORY` to your input folder path.
+3. Place your `.gpx` files in that input folder.
+4. Set `STANDARDIZED_OUTPUT_DIRECTORY` to your desired output folder path.
+5. Run `GpxFilesStandardizerApp`.
+6. The processed files will be saved with calculated efficiency details directly in the filename 
+   - (`[Town]_[Length]km_[Efficiency]eff_[Area]sqkm_[Index].gpx`)
+     - **Closest Town Name** (calculated from route coordinates)
+     - **Route Length** (total distance in km)
+     - **Efficiency Percentage** (how closely the route matches an ideal circle)
+     - **Enclosed Area** (surface area in sq km)
+     - **Sequence Counter** (file index)
