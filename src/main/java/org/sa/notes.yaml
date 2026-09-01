@@ -1,4 +1,6 @@
 problems:
+  - add Labanoras to towns list
+    - restandardize Labanoras routes
   - test b_storage (after refactoring) (code locations commented with "TODO")
 
 get maps:
